@@ -18,15 +18,17 @@
       <p class="subtitle">Lessons &amp; Carols</p>
       <p class="meta lang-en">Scripture readings and carols for this evening's service.</p>
       <p class="meta lang-ko" style="display: none;">이 밤 예배를 위한 성경 낭독과 성가입니다.</p>
-      <a href="#reading1" class="primary-button lang-en">Jump to First Reading</a>
-      <a href="#reading1" class="primary-button lang-ko" style="display: none;">첫 번째 낭독으로 이동</a>
     </div>
   </header>
 
   <nav class="toc">
     <div class="toc-inner">
-      <h2 class="lang-en">Program Overview</h2>
-      <h2 class="lang-ko" style="display: none;">프로그램 개요</h2>
+      <button class="toc-toggle" id="tocToggle" aria-expanded="false">
+        <span class="lang-en">Program Overview</span>
+        <span class="lang-ko" style="display: none;">프로그램 개요</span>
+        <span class="toc-arrow">▼</span>
+      </button>
+      <div class="toc-content" id="tocContent">
       <ol class="lang-en">
         <li><a href="#opening">Opening Music &amp; Prayer</a></li>
         <li><a href="#reading1">Reading I – Genesis 3:8–15</a> &amp; <a href="#carol1">O Come, O Come, Emmanuel</a></li>
@@ -53,6 +55,7 @@
         <li><a href="#reading9">낭독 9 – 요한복음 1:1-14</a> &amp; <a href="#carol9">오라 모든 신실한 자들</a></li>
         <li><a href="#closing">마침 기도 및 마지막 성가 – 첫 번째 노엘</a></li>
       </ol>
+      </div>
     </div>
   </nav>
 
@@ -571,6 +574,18 @@
     
     // Initialize with English
     switchLanguage('en');
+    
+    // Table of contents dropdown functionality
+    const tocToggle = document.getElementById('tocToggle');
+    const tocContent = document.getElementById('tocContent');
+    
+    tocToggle.addEventListener('click', () => {
+      const isExpanded = tocToggle.getAttribute('aria-expanded') === 'true';
+      tocToggle.setAttribute('aria-expanded', !isExpanded);
+      tocContent.style.display = isExpanded ? 'none' : 'block';
+      const arrow = tocToggle.querySelector('.toc-arrow');
+      arrow.textContent = isExpanded ? '▼' : '▲';
+    });
   </script>
 </body>
 </html>

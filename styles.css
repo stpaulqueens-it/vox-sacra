@@ -103,7 +103,7 @@ body {
 .toc {
   background: #111827;
   color: #e5e7eb;
-  padding: 0.75rem 1.25rem 1rem;
+  padding: 0.75rem 1.25rem;
   position: sticky;
   top: 0;
   z-index: 20;
@@ -115,29 +115,55 @@ body {
   font-size: 0.9rem;
 }
 
-.toc h2 {
+.toc-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #fbbf24;
   font-size: 0.95rem;
-  margin: 0 0 0.4rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #fbbf24;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.toc ol {
+.toc-toggle:hover {
+  color: #facc15;
+}
+
+.toc-arrow {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.toc-content {
+  display: none;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.toc-content ol {
   margin: 0;
   padding-left: 1.2rem;
 }
 
-.toc li {
+.toc-content li {
   margin: 0.2rem 0;
 }
 
-.toc a {
+.toc-content a {
   color: #e5e7eb;
   text-decoration: none;
 }
 
-.toc a:hover {
+.toc-content a:hover {
   text-decoration: underline;
 }
 
