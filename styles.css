@@ -22,6 +22,47 @@ body {
   max-width: 900px;
   margin: 0 auto;
   text-align: center;
+  position: relative;
+}
+
+.language-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .language-toggle {
+    position: static;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+}
+
+.lang-btn {
+  padding: 0.4rem 0.8rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.lang-btn.active {
+  background: #facc15;
+  color: #111827;
+  border-color: #facc15;
+  font-weight: 600;
 }
 
 .site-header h1 {
