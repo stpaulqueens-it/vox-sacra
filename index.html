@@ -10,24 +10,26 @@
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div class="language-toggle">
-        <button id="langToggle" class="lang-btn active" data-lang="en">English</button>
-        <button class="lang-btn" data-lang="ko">한국어</button>
-      </div>
-      <h1>말씀과 성가의 밤</h1>
+      <h1>말씀과 성가</h1>
       <p class="subtitle">Lessons &amp; Carols</p>
-      <p class="meta lang-en">Scripture readings and carols for this evening's service.</p>
-      <p class="meta lang-ko" style="display: none;">이 밤 예배를 위한 성경 낭독과 성가입니다.</p>
+      <p class="meta lang-en">Scripture readings and carols for this Advent service.</p>
+      <p class="meta lang-ko" style="display: none;">이 대림 행사의 독서과 성가입니다.</p>
     </div>
   </header>
 
   <nav class="toc">
     <div class="toc-inner">
-      <button class="toc-toggle" id="tocToggle" aria-expanded="false">
-        <span class="lang-en">Program Overview</span>
-        <span class="lang-ko" style="display: none;">프로그램 개요</span>
-        <span class="toc-arrow">▼</span>
-      </button>
+      <div class="toc-bar">
+        <button class="toc-toggle" id="tocToggle" aria-expanded="false">
+          <span class="lang-en">Program Overview</span>
+          <span class="lang-ko" style="display: none;">프로그램 개요</span>
+          <span class="toc-arrow">▼</span>
+        </button>
+        <div class="language-toggle">
+          <button id="langToggle" class="lang-btn active" data-lang="en">English</button>
+          <button class="lang-btn" data-lang="ko">한국어</button>
+        </div>
+      </div>
       <div class="toc-content" id="tocContent">
       <ol class="lang-en">
         <li><a href="#opening">Opening Music &amp; Prayer</a></li>
