@@ -31,8 +31,8 @@
     <div class="toc-inner">
       <div class="toc-bar">
         <button class="toc-toggle" @click="tocOpen = !tocOpen" :aria-expanded="tocOpen">
-          <span class="lang-en">Program Overview</span>
-          <span class="lang-ko" style="display: none;">프로그램 개요</span>
+          <span class="lang-en" x-text="getCurrentSectionName('en')">Program Overview</span>
+          <span class="lang-ko" style="display: none;" x-text="getCurrentSectionName('ko')">프로그램 개요</span>
           <span class="toc-arrow" x-text="tocOpen ? '▲' : '▼'">▼</span>
         </button>
       </div>
@@ -692,6 +692,27 @@
         
         updateNavButtons() {
           this.currentSectionIndex = this.getCurrentSectionIndex();
+        },
+        
+        getCurrentSectionName(lang) {
+          if (this.sections.length === 0 || this.currentSectionIndex < 0 || this.currentSectionIndex >= this.sections.length) {
+            return lang === 'en' ? 'Program Overview' : '프로그램 개요';
+          }
+          
+          const currentSection = this.sections[this.currentSectionIndex];
+          const heading = currentSection.querySelector(`h2.lang-${lang}`);
+          
+          if (heading) {
+            return heading.textContent.trim();
+          }
+          
+          // Fallback: try to get from h2 without lang class
+          const fallbackHeading = currentSection.querySelector('h2');
+          if (fallbackHeading) {
+            return fallbackHeading.textContent.trim();
+          }
+          
+          return lang === 'en' ? 'Program Overview' : '프로그램 개요';
         },
         
         zoomIn() {
