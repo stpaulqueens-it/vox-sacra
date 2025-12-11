@@ -1,852 +1,292 @@
 <!DOCTYPE html>
-<html :lang="currentLang === 'en' ? 'en' : 'ko'">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Lessons &amp; Carols – Program</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="description" content="Program for Lessons &amp; Carols: readings and carols in English and Korean.">
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script>
-    // Prevent pinch zoom and double-tap zoom
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function (event) {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-    
-    // Prevent pinch zoom gesture
-    document.addEventListener('gesturestart', function (e) {
-      e.preventDefault();
-    });
-    document.addEventListener('gesturechange', function (e) {
-      e.preventDefault();
-    });
-    document.addEventListener('gestureend', function (e) {
-      e.preventDefault();
-    });
-    
-    // Prevent wheel zoom (Ctrl/Cmd + scroll)
-    document.addEventListener('wheel', function (e) {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>Lessons & Carols</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body x-data="app()" x-init="init()" :style="`--text-zoom: ${textZoom}`">
-  <!-- Language Selection Modal -->
-  <div class="language-modal" x-show="showLanguageModal" x-transition>
-    <div class="language-modal-content">
-      <h2 class="lang-en">Select Language</h2>
-      <h2 class="lang-ko" style="display: none;">언어 선택</h2>
-      <div class="language-modal-buttons">
-        <button class="lang-modal-btn" @click="selectLanguage('en')">
-          <span class="lang-label">English</span>
-        </button>
-        <button class="lang-modal-btn" @click="selectLanguage('ko')">
-          <span class="lang-label">한국어</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <nav class="toc">
-    <div class="toc-inner">
-      <div class="toc-bar">
-        <button class="toc-toggle" @click="tocOpen = !tocOpen" :aria-expanded="tocOpen">
-          <span class="lang-en" x-text="getCurrentSectionName('en')">Program Overview</span>
-          <span class="lang-ko" style="display: none;" x-text="getCurrentSectionName('ko')">프로그램 개요</span>
-          <span class="toc-arrow" x-text="tocOpen ? '▲' : '▼'">▼</span>
-        </button>
-      </div>
-      <div class="toc-content" x-show="tocOpen" x-transition @click.self="tocOpen = false">
-      <ol class="lang-en">
-        <li><a href="#lessons-carols" @click="tocOpen = false">Lessons &amp; Carols</a></li>
-        <li><a href="#prayer-intro" @click="tocOpen = false">Opening Prayer: Introduction</a></li>
-        <li><a href="#prayer-our-father" @click="tocOpen = false">Opening Prayer: Our Father</a></li>
-        <li><a href="#prayer-hail-mary" @click="tocOpen = false">Opening Prayer: Hail Mary</a></li>
-        <li><a href="#prayer-closing" @click="tocOpen = false">Opening Prayer: Closing</a></li>
-        <li><a href="#reading1" @click="tocOpen = false">Reading I – Genesis 3:8–15</a></li>
-        <li><a href="#carol1" @click="tocOpen = false">O Come, O Come, Emmanuel</a></li>
-        <li><a href="#reading2" @click="tocOpen = false">Reading II – Genesis 22:15–18</a></li>
-        <li><a href="#creator-stars" @click="tocOpen = false">Creator of the Stars of Night</a></li>
-        <li><a href="#reading3" @click="tocOpen = false">Reading III – Isaiah 9:1–6</a></li>
-        <li><a href="#carol3" @click="tocOpen = false">Lo, How a Rose E'er Blooming</a></li>
-        <li><a href="#reading4" @click="tocOpen = false">Reading IV – Isaiah 11:1–9</a></li>
-        <li><a href="#carol4" @click="tocOpen = false">Once in Royal David's City</a></li>
-        <li><a href="#reading5" @click="tocOpen = false">Reading V – Luke 1:26–38</a></li>
-        <li><a href="#carol5" @click="tocOpen = false">Ave Maria</a></li>
-        <li><a href="#reading6" @click="tocOpen = false">Reading VI – Matthew 1:18–25</a></li>
-        <li><a href="#carol6" @click="tocOpen = false">Silent Night</a></li>
-        <li><a href="#reading7" @click="tocOpen = false">Reading VII – Luke 2:8–20</a></li>
-        <li><a href="#carol7" @click="tocOpen = false">Hark! The Herald Angels Sing</a></li>
-        <li><a href="#reading8" @click="tocOpen = false">Reading VIII – Matthew 2:1–12</a></li>
-        <li><a href="#carol8" @click="tocOpen = false">In Dulci Jubilo</a></li>
-        <li><a href="#reading9" @click="tocOpen = false">Reading IX – John 1:1–14</a></li>
-        <li><a href="#carol9" @click="tocOpen = false">O Come, All Ye Faithful</a></li>
-        <li><a href="#closing" @click="tocOpen = false">Closing Prayer &amp; Final Carol – The First Noel</a></li>
-        <li><a href="#feedback" @click="tocOpen = false">Feedback</a></li>
-      </ol>
-      <ol class="lang-ko" style="display: none;">
-        <li><a href="#lessons-carols" @click="tocOpen = false">말씀과 성가</a></li>
-        <li><a href="#prayer-intro" @click="tocOpen = false">시작 기도: 서론</a></li>
-        <li><a href="#prayer-our-father" @click="tocOpen = false">시작 기도: 주님의 기도</a></li>
-        <li><a href="#prayer-hail-mary" @click="tocOpen = false">시작 기도: 성모송</a></li>
-        <li><a href="#prayer-closing" @click="tocOpen = false">시작 기도: 마침</a></li>
-        <li><a href="#reading1" @click="tocOpen = false">낭독 1 – 창세기 3:8-15</a></li>
-        <li><a href="#carol1" @click="tocOpen = false">오라 오라 임마누엘</a></li>
-        <li><a href="#reading2" @click="tocOpen = false">낭독 2 – 창세기 22:15-18</a></li>
-        <li><a href="#creator-stars" @click="tocOpen = false">밤의 별들을 지으신 창조주</a></li>
-        <li><a href="#reading3" @click="tocOpen = false">낭독 3 – 이사야 9:1-6</a></li>
-        <li><a href="#carol3" @click="tocOpen = false">로즈가 피었도다</a></li>
-        <li><a href="#reading4" @click="tocOpen = false">낭독 4 – 이사야 11:1-9</a></li>
-        <li><a href="#carol4" @click="tocOpen = false">다윗 성에 한 번</a></li>
-        <li><a href="#reading5" @click="tocOpen = false">낭독 5 – 누가복음 1:26-38</a></li>
-        <li><a href="#carol5" @click="tocOpen = false">아베 마리아</a></li>
-        <li><a href="#reading6" @click="tocOpen = false">낭독 6 – 마태복음 1:18-25</a></li>
-        <li><a href="#carol6" @click="tocOpen = false">고요한 밤</a></li>
-        <li><a href="#reading7" @click="tocOpen = false">낭독 7 – 누가복음 2:8-20</a></li>
-        <li><a href="#carol7" @click="tocOpen = false">기쁘다 구주 오셨네</a></li>
-        <li><a href="#reading8" @click="tocOpen = false">낭독 8 – 마태복음 2:1-12</a></li>
-        <li><a href="#carol8" @click="tocOpen = false">인 둘치 주빌로</a></li>
-        <li><a href="#reading9" @click="tocOpen = false">낭독 9 – 요한복음 1:1-14</a></li>
-        <li><a href="#carol9" @click="tocOpen = false">오라 모든 신실한 자들</a></li>
-        <li><a href="#closing" @click="tocOpen = false">마침 기도 및 마지막 성가 – 첫 번째 노엘</a></li>
-        <li><a href="#feedback" @click="tocOpen = false">피드백</a></li>
-      </ol>
-      </div>
-    </div>
-  </nav>
-
-  <main class="content" id="mainContent" @scroll="updateNavButtons()" x-ref="mainContent">
-    <section id="lessons-carols" class="card">
-      <img src="img/cover-photo.jpg" alt="Lessons &amp; Carols" class="cover-photo" />
-    </section>
-
-    <section id="prayer-intro" class="card">
-      <img src="img/prayer-1-introduction.png" alt="Opening Prayer: Introduction" class="prayer-image" />
-    </section>
-
-    <section id="prayer-our-father" class="card">
-      <img src="img/prayer-2-pater-noster.png" alt="Opening Prayer: Our Father" class="prayer-image" />
-    </section>
-
-    <section id="prayer-hail-mary" class="card">
-      <img src="img/prayer-3-ave-maria.png" alt="Opening Prayer: Hail Mary" class="prayer-image" />
-    </section>
-
-    <section id="prayer-closing" class="card">
-      <img src="img/prayer-4-closing.png" alt="Opening Prayer: Closing" class="prayer-image" />
-    </section>
-
-    <section id="reading1" class="card">
-      <p class="lang-en"><em>The Fall and the First Promise of Redemption</em></p>
-      <p class="lang-ko" style="display: none;"><em>타락과 구원의 첫 약속</em></p>
-      <p class="lang-en">When they heard the sound of the LORD God walking about in the garden at the breezy time of the day, the man and his wife hid themselves from the LORD God among the trees of the garden.</p>
-      <p class="lang-ko" style="display: none;">그들이 날이 서늘할 때 동산에 거니시는 주 하느님의 소리를 들었습니다. 아담과 그의 아내는 주 하느님을 피하여 동산 나무들 사이에 숨었습니다.</p>
-      <p class="lang-en">The LORD God then called to the man and asked him: "Where are you?"</p>
-      <p class="lang-ko" style="display: none;">주 하느님께서 아담을 부르시며 말씀하셨습니다. "너 어디 있느냐?"</p>
-      <p class="lang-en">He answered, "I heard you in the garden; but I was afraid, because I was naked, so I hid."</p>
-      <p class="lang-ko" style="display: none;">아담이 대답했습니다. "동산에서 당신의 소리를 들었습니다. 그러나 벌거벗었으므로 두려워 숨었습니다."</p>
-      <p class="lang-en">Then God asked: "Who told you that you were naked? Have you eaten from the tree of which I had forbidden you to eat?"</p>
-      <p class="lang-ko" style="display: none;">하느님께서 물으셨습니다. "네가 벌거벗었다는 것을 누가 일러주었느냐? 내가 먹지 말라고 한 나무의 열매를 네가 먹었느냐?"</p>
-      <p class="lang-en">The man replied, "The woman whom you put here with me—she gave me fruit from the tree, so I ate it."</p>
-      <p class="lang-ko" style="display: none;">아담이 대답했습니다. "당신이 저와 함께 두신 여자가 그 나무의 열매를 주기에 제가 먹었습니다."</p>
-      <p class="lang-en">The LORD God then asked the woman: "What is this you have done?" The woman answered, "The snake tricked me, so I ate it."</p>
-      <p class="lang-ko" style="display: none;">주 하느님께서 여자에게 물으셨습니다. "네가 한 일이 무엇이냐?" 여자가 대답했습니다. "뱀이 저를 속여서 제가 먹었습니다."</p>
-      <p class="lang-en">Then the LORD God said to the snake:</p>
-      <p class="lang-ko" style="display: none;">주 하느님께서 뱀에게 말씀하셨습니다:</p>
-      <p class="lang-en">"Because you have done this, cursed are you among all the animals, tame or wild; on your belly you shall crawl, and dust you shall eat all the days of your life.</p>
-      <p class="lang-ko" style="display: none;">"네가 이렇게 하였으므로 모든 집짐승과 들짐승보다 저주를 받아, 네가 평생 배로 기어 다니고 흙을 먹을 것이다.</p>
-      <p class="lang-en">I will put enmity between you and the woman, and between your offspring and hers; they will strike at your head, while you strike at their heel."</p>
-      <p class="lang-ko" style="display: none;">내가 너와 여자 사이에, 그리고 네 후손과 여자의 후손 사이에 적의를 두리니, 여자의 후손은 네 머리를 상하게 하고 너는 그의 발꿈치를 상하게 할 것이다."</p>
-    </section>
-
-    <section id="carol1" class="card carol">
-      <p class="lang-en"><em>15th Century French melody, arr. David Willcocks</em></p>
-      <p class="lang-ko" style="display: none;"><em>15세기 프랑스 선율, 편곡 데이비드 윌콕스</em></p>
-      <h3 class="lang-en">Refrain</h3>
-      <h3 class="lang-ko" style="display: none;">후렴</h3>
-      <p class="lang-en"><strong>Rejoice! Rejoice! Emmanuel shall come to thee, O Israel.</strong></p>
-      <p class="lang-ko" style="display: none;"><strong>기뻐하라! 기뻐하라! 임마누엘이 오리라, 이스라엘이여.</strong></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">O come, O come, Emmanuel, Redeem thy captive Israel,<br/>
-      That into exile drear is gone far from the face of God's dear Son.</p>
-      <p class="lang-ko" style="display: none;">오라 오라 임마누엘, 포로된 이스라엘을 구하소서,<br/>
-      그들이 슬픈 유배지로 가서 하느님의 사랑하는 아들 얼굴에서 멀리 떠났나이다.</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">O come, thou Branch of Jesse! Draw the quarry from the lion's claw;<br/>
-      From the dread caverns of the grave, from nether hell, thy people save.</p>
-      <p class="lang-ko" style="display: none;">오라 이새의 가지여! 사자의 발톱에서 사냥감을 구하소서;<br/>
-      무서운 무덤의 동굴에서, 지옥에서 당신 백성을 구하소서.</p>
-      <h3 class="lang-en">Verse 3</h3>
-      <h3 class="lang-ko" style="display: none;">3절</h3>
-      <p class="lang-en">O come, O come, thou Dayspring bright! Pour on our souls thy healing light;<br/>
-      Dispel the long night's ling'ring gloom, and pierce the shadows of the tomb.</p>
-      <p class="lang-ko" style="display: none;">오라 오라 밝은 새벽별이여! 우리 영혼에 당신의 치유의 빛을 부어주소서;<br/>
-      긴 밤의 남아있는 어둠을 쫓으시고 무덤의 그림자를 뚫으소서.</p>
-      <h3 class="lang-en">Verse 4</h3>
-      <h3 class="lang-ko" style="display: none;">4절</h3>
-      <p class="lang-en">O come, thou Lord of David's Key! The royal door fling wide and free;<br/>
-      Safeguard for us the heav'nward road, and bar the way to death's abode.</p>
-      <p class="lang-ko" style="display: none;">오라 다윗의 열쇠의 주인이여! 왕의 문을 넓게 열어주소서;<br/>
-      우리를 위해 하늘로 가는 길을 지키시고 죽음의 거처로 가는 길을 막으소서.</p>
-      <h3 class="lang-en">Verse 5</h3>
-      <h3 class="lang-ko" style="display: none;">5절</h3>
-      <p class="lang-en">O come, O come, Adonai, who in thy glorious majesty<br/>
-      From that high mountain clothed with awe gavest thy folk the elder law.</p>
-      <p class="lang-ko" style="display: none;">오라 오라 아도나이여, 당신의 영광스러운 위엄으로<br/>
-      경외로움으로 덮인 그 높은 산에서 당신 백성에게 옛 법을 주셨나이다.</p>
-    </section>
-
-    <section id="reading2" class="card">
-      <p class="lang-en"><em>God's Promise to Abraham</em></p>
-      <p class="lang-ko" style="display: none;"><em>아브라함에게 하신 하느님의 약속</em></p>
-      <p class="lang-en">A second time the angel of the LORD called to Abraham from heaven and said:</p>
-      <p class="lang-ko" style="display: none;">주님의 천사가 하늘에서 아브라함을 두 번째로 불러 말했습니다:</p>
-      <p class="lang-en">"I swear by my very self—oracle of the LORD—that because you acted as you did in not withholding from me your son, your only one, I will bless you and make your descendants as countless as the stars of the sky and the sands of the seashore; your descendants will take possession of the gates of their enemies, and in your descendants all the nations of the earth will find blessing, because you obeyed my command."</p>
-      <p class="lang-ko" style="display: none;">"주님의 말씀으로 맹세하노니, 네가 네 외아들을 내게 아끼지 않았으므로, 내가 너를 축복하고 네 자손을 하늘의 별처럼, 바닷가의 모래처럼 많게 하리라. 네 자손이 그들의 원수들의 성문을 차지할 것이며, 네가 내 명령을 따랐으므로 네 자손으로 말미암아 땅의 모든 민족이 복을 받을 것이다."</p>
-    </section>
-
-    <section id="creator-stars" class="card carol">
-      <p class="lang-en"><em>Latin hymn (9th Century)</em></p>
-      <p class="lang-ko" style="display: none;"><em>라틴 찬송 (9세기)</em></p>
-      <p class="lang-en">This ancient evening hymn is sung as a response to the second reading.</p>
-      <p class="lang-ko" style="display: none;">이 고대 저녁 찬송은 두 번째 낭독에 대한 응답으로 불립니다.</p>
-    </section>
-
-    <section id="reading3" class="card">
-      <p class="lang-en"><em>The People Who Walked in Darkness Have Seen a Great Light</em></p>
-      <p class="lang-ko" style="display: none;"><em>어둠 속을 걷던 백성이 큰 빛을 보았도다</em></p>
-      <p class="lang-en">The people who walked in darkness have seen a great light; upon those who lived in a land of gloom a light has shone.</p>
-      <p class="lang-ko" style="display: none;">어둠 속을 걷던 백성이 큰 빛을 보았고, 죽음의 그늘진 땅에 사는 사람들에게 빛이 비쳤도다.</p>
-      <p class="lang-en">You have brought them abundant joy and great rejoicing; they rejoice before you as people rejoice at harvest, as they exult when dividing the spoils.</p>
-      <p class="lang-ko" style="display: none;">당신께서 그들에게 큰 기쁨을 주셨고, 그들이 당신 앞에서 기뻐하니, 추수 때 기뻐하는 것 같고, 전리품을 나눌 때 즐거워하는 것 같도다.</p>
-      <p class="lang-en">For the yoke that burdened them, the pole on their shoulder, the rod of their taskmaster, you have smashed, as on the day of Midian.</p>
-      <p class="lang-ko" style="display: none;">그들이 메었던 멍에와 어깨의 채찍, 압제자의 몽둥이를 당신께서 미디안의 날처럼 꺾으셨도다.</p>
-      <p class="lang-en">For every boot that tramped in battle, every cloak rolled in blood, will be burned as fuel for fire.</p>
-      <p class="lang-ko" style="display: none;">전쟁에서 짓밟힌 모든 군화와 피에 젖은 옷이 불에 타서 연료가 되리라.</p>
-      <p class="lang-en">For a child is born to us, a son is given to us; upon his shoulder dominion rests. They name him Wonder-Counselor, God-Hero, Father-Forever, Prince of Peace.</p>
-      <p class="lang-ko" style="display: none;">우리에게 한 아기가 태어났고, 우리에게 한 아들이 주어졌도다. 그의 어깨에 통치권이 놓이리라. 그의 이름은 놀라운 상담자, 전능한 하느님, 영원한 아버지, 평화의 왕이라 불리리라.</p>
-      <p class="lang-en">His dominion is vast and forever peaceful, upon David's throne, and over his kingdom, which he confirms and sustains by judgment and justice, both now and forever. The zeal of the LORD of hosts will do this!</p>
-      <p class="lang-ko" style="display: none;">그의 통치는 확대되어 끝없는 평화가 다윗의 왕좌와 그의 나라 위에 있을 것이며, 이를 공정과 정의로 굳게 세워 영원토록 지속시키리라. 만군의 주님의 열심이 이를 이루시리라!</p>
-    </section>
-
-    <section id="carol3" class="card carol">
-      <p class="lang-en"><em>14th Century German melody</em></p>
-      <p class="lang-ko" style="display: none;"><em>14세기 독일 선율</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">Lo, how a Rose e'er blooming from tender stem hath sprung!<br/>
-      Of Jesse's lineage coming, as men of old have sung.<br/>
-      It came, a flow'ret bright, amid the cold of winter, when half-spent was the night.</p>
-      <p class="lang-ko" style="display: none;">보라, 부드러운 줄기에서 로즈가 피었도다!<br/>
-      이새의 혈통에서 나왔으니, 옛 사람들이 노래한 대로.<br/>
-      그것이 왔도다, 밝은 꽃이, 추운 겨울 가운데, 밤이 반쯤 지났을 때.</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">Isaiah 'twas foretold it, the Rose I have in mind;<br/>
-      With Mary we behold it, the Virgin Mother kind.<br/>
-      To show God's love aright, she bore to men a Savior, when half-spent was the night.</p>
-      <p class="lang-ko" style="display: none;">이사야가 예언했도다, 내가 생각하는 그 로즈를;<br/>
-      마리아와 함께 우리가 그것을 보니, 자비로운 동정녀 어머니시도다.<br/>
-      하느님의 사랑을 바르게 보이시려, 그녀가 사람들에게 구주를 낳으셨도다, 밤이 반쯤 지났을 때.</p>
-    </section>
-
-    <section id="reading4" class="card">
-      <p class="lang-en"><em>The Peaceable Kingdom</em></p>
-      <p class="lang-ko" style="display: none;"><em>평화로운 왕국</em></p>
-      <p class="lang-en">But a shoot shall sprout from the stump of Jesse, and from his roots a bud shall blossom.</p>
-      <p class="lang-ko" style="display: none;">이새의 그루터기에서 한 싹이 나오고, 그 뿌리에서 한 가지가 돋아나 꽃을 피우리라.</p>
-      <p class="lang-en">The spirit of the LORD shall rest upon him: a spirit of wisdom and of understanding, a spirit of counsel and of strength, a spirit of knowledge and of fear of the LORD, and his delight shall be the fear of the LORD.</p>
-      <p class="lang-ko" style="display: none;">주님의 영이 그 위에 내리시리니, 지혜와 통찰의 영, 계획과 용기의 영, 지식과 주님을 경외하는 영이시리라. 그는 주님을 경외하는 것을 즐거워하리라.</p>
-      <p class="lang-en">Not by appearance shall he judge, nor by hearsay shall he decide, but he shall judge the poor with justice, and decide fairly for the land's afflicted. He shall strike the ruthless with the rod of his mouth, and with the breath of his lips he shall slay the wicked.</p>
-      <p class="lang-ko" style="display: none;">그는 외모로 판단하지 않고, 소문으로 결정하지 않으며, 가난한 사람을 정의로 판단하고, 땅의 고통받는 사람들을 공정하게 판결하리라. 그는 입의 막대기로 포악한 자를 치고, 입술의 호흡으로 악인을 죽이리라.</p>
-      <p class="lang-en">Justice shall be the band around his waist, and faithfulness a belt upon his hips.</p>
-      <p class="lang-ko" style="display: none;">정의가 그의 허리띠가 되고, 신실함이 그의 허리띠가 되리라.</p>
-      <p class="lang-en">Then the wolf shall be a guest of the lamb, and the leopard shall lie down with the young goat; the calf and the young lion shall browse together, with a little child to guide them.</p>
-      <p class="lang-ko" style="display: none;">그때 이리가 어린 양과 함께 살고, 표범이 새끼 염소와 함께 누우며, 송아지와 젊은 사자가 함께 풀을 뜯고, 어린 아이가 그들을 이끌리라.</p>
-      <p class="lang-en">The cow and the bear shall graze, together their young shall lie down; the lion shall eat hay like the ox.</p>
-      <p class="lang-ko" style="display: none;">암소와 곰이 함께 풀을 뜯고, 그들의 새끼들이 함께 누우며, 사자가 소처럼 건초를 먹으리라.</p>
-      <p class="lang-en">The baby shall play by the viper's den, and the child lay his hand on the adder's lair.</p>
-      <p class="lang-ko" style="display: none;">젖먹이 아이가 독사의 굴에서 놀고, 어린 아이가 독사의 구멍에 손을 넣으리라.</p>
-      <p class="lang-en">They shall not harm or destroy on all my holy mountain; for the earth shall be filled with knowledge of the LORD, as water covers the sea.</p>
-      <p class="lang-ko" style="display: none;">그들은 내 거룩한 산 어디에서도 해치거나 파괴하지 않으리라. 땅이 주님을 아는 지식으로 가득 차리니, 마치 물이 바다를 덮음 같으리라.</p>
-    </section>
-
-    <section id="carol4" class="card carol">
-      <p class="lang-en"><em>H.J. Gauntlett, arr. David Willcocks</em></p>
-      <p class="lang-ko" style="display: none;"><em>H.J. 건틀렛, 편곡 데이비드 윌콕스</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">Once in royal David's city stood a lowly cattle shed, where a mother laid her baby in a manger for his bed:<br/>
-      Mary was that mother mild, Jesus Christ, her little child.</p>
-      <p class="lang-ko" style="display: none;">다윗 성에 한 번 낮은 외양간이 서 있었도다, 어머니가 그 아기를 구유에 눕혔도다:<br/>
-      마리아가 그 온화한 어머니였고, 예수 그리스도가 그 작은 아이였도다.</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">He came down to earth from heaven, who is God and Lord of all, and his shelter was a stable, and his cradle was a stall; with the poor, and mean, and lowly, lived on earth our Savior holy.</p>
-      <p class="lang-ko" style="display: none;">그가 하늘에서 땅으로 내려오셨도다, 모든 것의 하느님이시요 주님이시니, 그의 거처는 외양간이었고 그의 요람은 마구간이었도다; 가난하고 천하고 낮은 자들과 함께, 우리 거룩한 구주가 땅에서 살았도다.</p>
-      <h3 class="lang-en">Verse 3</h3>
-      <h3 class="lang-ko" style="display: none;">3절</h3>
-      <p class="lang-en">And through all his wondrous childhood he would honor and obey, love, and watch the lowly maiden, in whose gentle arms he lay:<br/>
-      Christian children all must be mild, obedient, good as he.</p>
-      <p class="lang-ko" style="display: none;">그리고 그의 모든 놀라운 어린 시절 동안 그는 존경하고 순종하며, 사랑하고, 그 온화한 팔에 누워 있던 낮은 처녀를 지켰도다:<br/>
-      그리스도인 아이들은 모두 온화하고 순종하며 그처럼 선해야 하리라.</p>
-      <h3 class="lang-en">Verse 4</h3>
-      <h3 class="lang-ko" style="display: none;">4절</h3>
-      <p class="lang-en">For he is our childhood's pattern, day by day like us he grew, he was little, weak, and helpless, tears and smiles like us he knew; and he feeleth for our sadness, and he shareth in our gladness.</p>
-      <p class="lang-ko" style="display: none;">그는 우리 어린 시절의 본이시니, 날마다 우리처럼 자라셨고, 그는 작고 약하고 무력하셨으며, 우리처럼 눈물과 미소를 아셨도다; 그는 우리의 슬픔을 느끼시고 우리의 기쁨을 함께하시도다.</p>
-      <h3 class="lang-en">Verse 6</h3>
-      <h3 class="lang-ko" style="display: none;">6절</h3>
-      <p class="lang-en">Not in that poor lowly stable, with the oxen standing by, we shall see him; but in heaven, set at God's right hand on high; when like stars his children crowned all in white shall wait around.</p>
-      <p class="lang-ko" style="display: none;">그 가난하고 낮은 외양간에서, 소들이 곁에 서 있는 곳에서 우리가 그를 보지 않으리라; 그러나 하늘에서, 하느님의 오른편 높은 곳에 앉으셨을 때; 별처럼 그의 자녀들이 면류관을 쓰고 모두 흰 옷을 입고 주위에서 기다리리라.</p>
-    </section>
-
-    <section id="reading5" class="card">
-      <p class="lang-en"><em>The Annunciation</em></p>
-      <p class="lang-ko" style="display: none;"><em>성모 영보</em></p>
-      <p class="lang-en">In the sixth month, the angel Gabriel was sent from God to a town of Galilee called Nazareth, to a virgin betrothed to a man named Joseph, of the house of David, and the virgin's name was Mary.</p>
-      <p class="lang-ko" style="display: none;">여섯째 달에 천사 가브리엘이 하느님께서 보내신 이로 갈릴래아의 나자렛이라는 동네에 가서, 다윗 집안의 요셉이라는 사람과 약혼한 동정녀에게 갔는데, 그 동정녀의 이름은 마리아였다.</p>
-      <p class="lang-en">And coming to her, he said, "Hail, favored one! The Lord is with you."</p>
-      <p class="lang-ko" style="display: none;">그가 그녀에게 가서 말했다. "은총을 받은 이여, 기뻐하여라! 주님이 너와 함께 계시다."</p>
-      <p class="lang-en">But she was greatly troubled at what was said and pondered what sort of greeting this might be.</p>
-      <p class="lang-ko" style="display: none;">그러나 그녀는 이 말씀에 크게 당황하여 어떤 인사인지 생각해 보았다.</p>
-      <p class="lang-en">Then the angel said to her, "Do not be afraid, Mary, for you have found favor with God. Behold, you will conceive in your womb and bear a son, and you shall name him Jesus.</p>
-      <p class="lang-ko" style="display: none;">그러자 천사가 그녀에게 말했다. "두려워하지 마라, 마리아야. 너는 하느님께 은총을 받았다. 보라, 네가 잉태하여 아들을 낳으리니 그 이름을 예수라 하여라.</p>
-      <p class="lang-en">He will be great and will be called Son of the Most High, and the Lord God will give him the throne of David his father, and he will rule over the house of Jacob forever, and of his kingdom there will be no end."</p>
-      <p class="lang-ko" style="display: none;">그는 위대한 분이 되시고 지극히 높으신 분의 아들이라 불릴 것이며, 주 하느님께서 그에게 그의 아버지 다윗의 왕좌를 주시리라. 그는 야곱 집안을 영원히 다스리시고 그의 나라는 끝이 없을 것이다."</p>
-      <p class="lang-en">But Mary said to the angel, "How can this be, since I have no relations with a man?"</p>
-      <p class="lang-ko" style="display: none;">마리아가 천사에게 말했다. "이 일이 어떻게 될 수 있습니까? 저는 남자를 알지 못합니다."</p>
-      <p class="lang-en">And the angel said to her in reply, "The holy Spirit will come upon you, and the power of the Most High will overshadow you. Therefore the child to be born will be called holy, the Son of God.</p>
-      <p class="lang-ko" style="display: none;">천사가 그녀에게 대답하여 말했다. "성령이 네 위에 내리시고 지극히 높으신 분의 능력이 네를 덮으시리라. 그러므로 태어날 거룩한 아기는 하느님의 아들이라 불릴 것이다.</p>
-      <p class="lang-en">And behold, Elizabeth, your relative, has also conceived a son in her old age, and this is the sixth month for her who was called barren; for nothing will be impossible for God."</p>
-      <p class="lang-ko" style="display: none;">보라, 네 친척 엘리사벳도 늙은 나이에 아들을 잉태했는데, 그녀는 불임이라 불리던 이였고 지금은 여섯째 달이다. 하느님께는 불가능한 일이 없다."</p>
-      <p class="lang-en">Mary said, "Behold, I am the handmaid of the Lord. May it be done to me according to your word." Then the angel departed from her.</p>
-      <p class="lang-ko" style="display: none;">마리아가 말했다. "보십시오, 주님의 여종입니다. 당신의 말씀대로 제게 이루어지기를 바랍니다." 그러자 천사가 그녀에게서 떠나갔다.</p>
-    </section>
-
-    <section id="carol5" class="card carol">
-      <p class="lang-en"><em>Jacques Arcadelt, 16th Century</em></p>
-      <p class="lang-ko" style="display: none;"><em>자크 아르카델트, 16세기</em></p>
-      <p class="lang-en">Ave Maria, gratia plena,<br/>
-      Dominus tecum;<br/>
-      benedicta tu in mulieribus,<br/>
-      et benedictus fructus ventris tui, Iesus.<br/>
-      Sancta Maria, Mater Dei,<br/>
-      ora pro nobis peccatoribus,<br/>
-      nunc et in hora mortis nostrae.<br/>
-      Amen.</p>
-      <p class="lang-ko" style="display: none;">아베 마리아, 은총이 가득하신 분,<br/>
-      주님께서 당신과 함께 계시며,<br/>
-      여인들 가운데 당신이 복되시고,<br/>
-      당신 태중의 열매 예수도 복되시나이다.<br/>
-      거룩한 마리아, 하느님의 어머니,<br/>
-      우리 죄인을 위하여 빌어주시고,<br/>
-      지금 그리고 우리 죽음의 때에.<br/>
-      아멘.</p>
-    </section>
-
-    <section id="reading6" class="card">
-      <p class="lang-en"><em>The Birth of Jesus Christ</em></p>
-      <p class="lang-ko" style="display: none;"><em>예수 그리스도의 탄생</em></p>
-      <p class="lang-en">Now this is how the birth of Jesus Christ came about. When his mother Mary was betrothed to Joseph, but before they lived together, she was found with child through the holy Spirit.</p>
-      <p class="lang-ko" style="display: none;">예수 그리스도의 탄생은 이러하였다. 그의 어머니 마리아가 요셉과 약혼하였는데, 그들이 함께 살기 전에 성령으로 잉태된 것이 드러났다.</p>
-      <p class="lang-en">Joseph her husband, since he was a righteous man, yet unwilling to expose her to shame, decided to divorce her quietly.</p>
-      <p class="lang-ko" style="display: none;">그의 남편 요셉은 의로운 사람이었고, 그녀를 수치스럽게 하고 싶지 않아 조용히 이혼하려고 하였다.</p>
-      <p class="lang-en">Such was his intention when, behold, the angel of the Lord appeared to him in a dream and said, "Joseph, son of David, do not be afraid to take Mary your wife into your home. For it is through the holy Spirit that this child has been conceived in her.</p>
-      <p class="lang-ko" style="display: none;">그가 이렇게 생각하고 있을 때, 주님의 천사가 꿈에 나타나 말했다. "다윗의 자손 요셉아, 네 아내 마리아를 집으로 데려오는 것을 두려워하지 마라. 그녀가 잉태한 것은 성령으로 말미암은 것이다.</p>
-      <p class="lang-en">She will bear a son and you are to name him Jesus, because he will save his people from their sins."</p>
-      <p class="lang-ko" style="display: none;">그녀가 아들을 낳으리니 그 이름을 예수라 하여라. 그가 자기 백성을 그들의 죄에서 구원할 것이다."</p>
-      <p class="lang-en">All this took place to fulfill what the Lord had said through the prophet: "Behold, the virgin shall be with child and bear a son, and they shall name him Emmanuel," which means "God is with us."</p>
-      <p class="lang-ko" style="display: none;">이 모든 일이 일어난 것은 주님께서 예언자를 통하여 하신 말씀을 이루려 하심이었다. "보라, 동정녀가 잉태하여 아들을 낳으리니 그 이름을 임마누엘이라 하리라." 이는 "하느님이 우리와 함께 계시다"는 뜻이다.</p>
-      <p class="lang-en">When Joseph awoke, he did as the angel of the Lord had commanded him and took his wife into his home. He had no relations with her until she bore a son, and he named him Jesus.</p>
-      <p class="lang-ko" style="display: none;">요셉이 잠에서 깨어나 주님의 천사가 명령한 대로 하여 그의 아내를 집으로 데려왔다. 그는 그녀가 아들을 낳을 때까지 그녀와 관계하지 않았고, 그가 태어난 아들의 이름을 예수라 하였다.</p>
-    </section>
-
-    <section id="carol6" class="card carol">
-      <p class="lang-en"><em>Franz Gruber, arr. John Rutter</em></p>
-      <p class="lang-ko" style="display: none;"><em>프란츠 그루버, 편곡 존 러터</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">Silent night, holy night, all is calm, all is bright, round yon Virgin, Mother and Child, holy Infant so tender and mild, sleep in heavenly peace, sleep in heavenly peace.</p>
-      <p class="lang-ko" style="display: none;">고요한 밤, 거룩한 밤, 모든 것이 고요하고 밝도다, 저 처녀와 어머니와 아이 주위에, 거룩한 아기 그렇게 부드럽고 온화하도다, 하늘의 평화 속에서 잠들어라, 하늘의 평화 속에서 잠들어라.</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">Silent night, holy night, shepherds quake at the sight; glories stream from heaven afar, heav'nly hosts sing: "Alleluia! Christ the Savior is born! Christ the Savior is born!"</p>
-      <p class="lang-ko" style="display: none;">고요한 밤, 거룩한 밤, 목자들이 그 광경에 떨도다; 영광이 멀리 하늘에서 흘러내리고, 하늘의 무리가 노래하도다: "할렐루야! 그리스도 구주가 태어나셨도다! 그리스도 구주가 태어나셨도다!"</p>
-      <h3 class="lang-en">Verse 3</h3>
-      <h3 class="lang-ko" style="display: none;">3절</h3>
-      <p class="lang-en">Silent night, holy night, Son of God, love's pure light, radiant beams from thy holy face, with the dawn of redeeming grace, Jesus, Lord, at thy birth, Jesus, Lord, at thy birth.</p>
-      <p class="lang-ko" style="display: none;">고요한 밤, 거룩한 밤, 하느님의 아들, 사랑의 순수한 빛, 당신의 거룩한 얼굴에서 빛나는 광선이, 구원의 은총의 새벽과 함께, 예수, 주님, 당신의 탄생에, 예수, 주님, 당신의 탄생에.</p>
-    </section>
-
-    <section id="reading7" class="card">
-      <p class="lang-en"><em>The Birth of Jesus Announced to Shepherds</em></p>
-      <p class="lang-ko" style="display: none;"><em>목자들에게 전해진 예수의 탄생 소식</em></p>
-      <p class="lang-en">Now there were shepherds in that region living in the fields and keeping the night watch over their flock.</p>
-      <p class="lang-ko" style="display: none;">그 지역에 목자들이 있었는데, 들에서 밤을 지새우며 양 떼를 지키고 있었다.</p>
-      <p class="lang-en">The angel of the Lord appeared to them and the glory of the Lord shone around them, and they were struck with great fear.</p>
-      <p class="lang-ko" style="display: none;">주님의 천사가 그들에게 나타나고 주님의 영광이 그들을 둘러 비추니, 그들이 크게 두려워하였다.</p>
-      <p class="lang-en">The angel said to them, "Do not be afraid; for behold, I proclaim to you good news of great joy that will be for all the people.</p>
-      <p class="lang-ko" style="display: none;">천사가 그들에게 말했다. "두려워하지 마라. 보라, 내가 온 백성에게 큰 기쁨이 될 좋은 소식을 너희에게 전한다.</p>
-      <p class="lang-en">For today in the city of David a savior has been born for you who is Messiah and Lord.</p>
-      <p class="lang-ko" style="display: none;">오늘 다윗의 성읍에 너희를 위한 구주가 태어나셨으니, 그분은 메시아이시요 주님이시다.</p>
-      <p class="lang-en">And this will be a sign for you: you will find an infant wrapped in swaddling clothes and lying in a manger."</p>
-      <p class="lang-ko" style="display: none;">너희에게 표적이 있으니, 너희가 강보에 싸여 구유에 누워 있는 아기를 찾을 것이다."</p>
-      <p class="lang-en">And suddenly there was a multitude of the heavenly host with the angel, praising God and saying: "Glory to God in the highest and on earth peace to those on whom his favor rests."</p>
-      <p class="lang-ko" style="display: none;">갑자기 천사와 함께 하늘의 무리가 나타나 하느님을 찬양하며 말했다. "지극히 높은 곳에서는 하느님께 영광이요, 땅에서는 그분의 마음에 드는 사람들에게 평화로다."</p>
-      <p class="lang-en">When the angels went away from them to heaven, the shepherds said to one another, "Let us go, then, to Bethlehem to see this thing that has taken place, which the Lord has made known to us."</p>
-      <p class="lang-ko" style="display: none;">천사들이 그들에게서 떠나 하늘로 올라갔을 때, 목자들이 서로 말했다. "자, 베들레헴으로 가서 주님께서 우리에게 알려주신 이 일이 일어난 것을 보자."</p>
-      <p class="lang-en">So they went in haste and found Mary and Joseph, and the infant lying in the manger.</p>
-      <p class="lang-ko" style="display: none;">그들이 급히 가서 마리아와 요셉, 그리고 구유에 누워 있는 아기를 찾았다.</p>
-      <p class="lang-en">When they saw this, they made known the message that had been told them about this child.</p>
-      <p class="lang-ko" style="display: none;">그들이 이것을 보고 이 아이에 대해 말해 준 소식을 전하였다.</p>
-      <p class="lang-en">All who heard it were amazed by what had been told them by the shepherds.</p>
-      <p class="lang-ko" style="display: none;">이것을 들은 모든 사람이 목자들이 말한 것에 놀라워하였다.</p>
-      <p class="lang-en">And Mary kept all these things, reflecting on them in her heart.</p>
-      <p class="lang-ko" style="display: none;">마리아는 이 모든 일을 마음에 간직하며 되새겨 보았다.</p>
-      <p class="lang-en">Then the shepherds returned, glorifying and praising God for all they had heard and seen, just as it had been told to them.</p>
-      <p class="lang-ko" style="display: none;">그리고 목자들은 들려주신 대로 들은 것과 본 모든 일로 인해 하느님을 찬양하고 영광을 돌리며 돌아갔다.</p>
-    </section>
-
-    <section id="carol7" class="card carol">
-      <p class="lang-en"><em>Felix Mendelssohn, arr. David Willcocks</em></p>
-      <p class="lang-ko" style="display: none;"><em>펠릭스 멘델스존, 편곡 데이비드 윌콕스</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">Hark! the herald angels sing, "Glory to the newborn King; peace on earth, and mercy mild, God and sinners reconciled." Joyful, all ye nations, rise, join the triumph of the skies; with the angelic host proclaim, "Christ is born in Bethlehem!" Hark! the herald angels sing, "Glory to the newborn King!"</p>
-      <p class="lang-ko" style="display: none;">들으라! 전령 천사들이 노래하도다, "새로 태어난 왕께 영광이요; 땅에는 평화, 자비는 온화하도다, 하느님과 죄인이 화해하도다." 기쁘도다, 모든 민족들아, 일어나라, 하늘의 승리를 함께하라; 천사의 무리와 함께 선포하라, "그리스도가 베들레헴에서 태어나셨도다!" 들으라! 전령 천사들이 노래하도다, "새로 태어난 왕께 영광이요!"</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">Christ, by highest heav'n adored, Christ, the everlasting Lord, late in time behold him come, offspring of a Virgin's womb. Veiled in flesh, the Godhead see; hail th'incarnate Deity, pleased, as man, with men to dwell, Jesus, our Emmanuel. Hark! the herald angels sing, "Glory to the newborn King!"</p>
-      <p class="lang-ko" style="display: none;">그리스도, 가장 높은 하늘에서 경배받으시는 분, 그리스도, 영원한 주님, 때가 늦어 그가 오심을 보라, 동정녀 태중의 자손이시도다. 육체로 가려진 하느님을 보라; 성육신한 신성을 찬양하라, 기뻐하시며 사람으로 사람들과 함께 거하시도다, 예수, 우리의 임마누엘이시도다. 들으라! 전령 천사들이 노래하도다, "새로 태어난 왕께 영광이요!"</p>
-      <h3 class="lang-en">Verse 3</h3>
-      <h3 class="lang-ko" style="display: none;">3절</h3>
-      <p class="lang-en">Hail! the heav'n-born Prince of Peace! Hail! the Son of Righteousness! Light and life to all he brings, ris'n with healing in his wings. Mild he lays his glory by, born that man no more may die, born to raise the sons of earth, born to give them second birth. Hark! the herald angels sing, "Glory to the newborn King!"</p>
-      <p class="lang-ko" style="display: none;">만세! 하늘에서 태어난 평화의 왕자여! 만세! 의의 아들이여! 모든 이에게 빛과 생명을 가져오시고, 그의 날개에 치유를 가지고 일어나셨도다. 온화하게 그의 영광을 내려놓으시고, 사람이 더 이상 죽지 않도록 태어나셨도다, 땅의 아들들을 일으키시려 태어나셨고, 그들에게 두 번째 탄생을 주시려 태어나셨도다. 들으라! 전령 천사들이 노래하도다, "새로 태어난 왕께 영광이요!"</p>
-    </section>
-
-    <section id="reading8" class="card">
-      <p class="lang-en"><em>The Visit of the Magi</em></p>
-      <p class="lang-ko" style="display: none;"><em>동방 박사들의 방문</em></p>
-      <p class="lang-en">When Jesus was born in Bethlehem of Judea, in the days of King Herod, behold, magi from the east arrived in Jerusalem, saying, "Where is the newborn king of the Jews? We saw his star at its rising and have come to do him homage."</p>
-      <p class="lang-ko" style="display: none;">예수께서 유다의 베들레헴에서 태어나셨을 때, 헤로데 왕의 시대에 동방에서 온 박사들이 예루살렘에 도착하여 말했다. "유다인의 새로 태어난 왕이 어디 계십니까? 우리가 그의 별이 떠오르는 것을 보고 그에게 경배하러 왔습니다."</p>
-      <p class="lang-en">When King Herod heard this, he was greatly troubled, and all Jerusalem with him.</p>
-      <p class="lang-ko" style="display: none;">헤로데 왕이 이것을 듣고 크게 당황하였고, 온 예루살렘도 그와 함께 당황하였다.</p>
-      <p class="lang-en">Assembling all the chief priests and the scribes of the people, he inquired of them where the Messiah was to be born.</p>
-      <p class="lang-ko" style="display: none;">모든 대사제와 백성의 서기관들을 모아 놓고 그들에게 메시아가 어디서 태어날 것인지 물었다.</p>
-      <p class="lang-en">They said to him, "In Bethlehem of Judea, for thus it has been written through the prophet: 'And you, Bethlehem, land of Judah, are by no means least among the rulers of Judah; since from you shall come a ruler, who is to shepherd my people Israel.'"</p>
-      <p class="lang-ko" style="display: none;">그들이 그에게 말했다. "유다의 베들레헴입니다. 예언자를 통하여 이렇게 기록되어 있기 때문입니다. '유다 땅 베들레헴아, 너는 유다의 통치자들 가운데 결코 가장 작은 자가 아니다. 너에게서 내 백성 이스라엘을 다스릴 통치자가 나올 것이다.'"</p>
-      <p class="lang-en">Then Herod called the magi secretly and ascertained from them the time of the star's appearance.</p>
-      <p class="lang-ko" style="display: none;">그러자 헤로데가 박사들을 몰래 불러 별이 나타난 때를 정확히 알아냈다.</p>
-      <p class="lang-en">He sent them to Bethlehem and said, "Go and search diligently for the child. When you have found him, bring me word, that I too may go and do him homage."</p>
-      <p class="lang-ko" style="display: none;">그는 그들을 베들레헴으로 보내며 말했다. "가서 그 아이를 부지런히 찾아라. 그를 찾으면 나에게 알려주어라. 나도 가서 그에게 경배하겠다."</p>
-      <p class="lang-en">After their audience with the king they set out. And behold, the star that they had seen at its rising preceded them, until it came and stopped over the place where the child was.</p>
-      <p class="lang-ko" style="display: none;">왕과의 면담 후 그들이 길을 떠났다. 그들이 떠오르는 것을 본 그 별이 그들 앞에서 가다가 아이가 있는 곳 위에 멈추었다.</p>
-      <p class="lang-en">They were overjoyed at seeing the star, and on entering the house they saw the child with Mary his mother. They prostrated themselves and did him homage.</p>
-      <p class="lang-ko" style="display: none;">그들이 별을 보고 크게 기뻐하며, 집에 들어가 마리아와 함께 있는 아이를 보았다. 그들이 엎드려 그에게 경배하였다.</p>
-      <p class="lang-en">Then they opened their treasures and offered him gifts of gold, frankincense, and myrrh.</p>
-      <p class="lang-ko" style="display: none;">그리고 그들이 보물 상자를 열어 그에게 금과 유향과 몰약을 선물로 드렸다.</p>
-      <p class="lang-en">And having been warned in a dream not to return to Herod, they departed for their country by another way.</p>
-      <p class="lang-ko" style="display: none;">그리고 그들이 꿈에 헤로데에게 돌아가지 말라는 경고를 받아 다른 길로 자기 나라로 돌아갔다.</p>
-    </section>
-
-    <section id="carol8" class="card carol">
-      <p class="lang-en"><em>Old German carol, arr. R. L. Pearsall</em></p>
-      <p class="lang-ko" style="display: none;"><em>고대 독일 성가, 편곡 R. L. 피어솔</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">In dulci jubilo, let us our homage show: our heart's joy reclineth in praesepio; and like a bright star shineth matris in gremio, Alpha es et O!</p>
-      <p class="lang-ko" style="display: none;">달콤한 환호 속에서, 우리의 경배를 보이자: 우리 마음의 기쁨이 구유에 누워 있도다; 그리고 밝은 별처럼 어머니의 품에서 빛나시도다, 알파와 오메가시도다!</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">O Jesu, parvule, I yearn for thee alway! Hear me, I beseech thee, O puer optime; my prayer, let it reach thee, O princeps gloriae! Trahe me post te!</p>
-      <p class="lang-ko" style="display: none;">오 예수, 작은 아이여, 내가 항상 당신을 그리워하도다! 나를 들으소서, 당신께 간청하나이다, 오 최고의 아이여; 내 기도가 당신께 닿기를, 오 영광의 왕자여! 나를 당신 뒤로 이끄소서!</p>
-      <h3 class="lang-en">Verse 3</h3>
-      <h3 class="lang-ko" style="display: none;">3절</h3>
-      <p class="lang-en">O patris caritas! O nati lenitas! Deeply were we stained per nostra crimina; but thou hast for us gained coelorum gaudia. — O that we were there! — O that we were there!</p>
-      <p class="lang-ko" style="display: none;">오 아버지의 사랑이여! 오 아들의 온화함이여! 우리는 우리의 죄로 깊이 더럽혔도다; 그러나 당신이 우리를 위해 하늘의 기쁨을 얻으셨도다. — 오 우리가 거기 있었더라면! — 오 우리가 거기 있었더라면!</p>
-      <h3 class="lang-en">Verse 4</h3>
-      <h3 class="lang-ko" style="display: none;">4절</h3>
-      <p class="lang-en">Ubi sunt gaudia, where, if they be not there? There are angels singing nova cantica; there the bells are ringing, in Regis curia. — O that we were there! — O that we were there!</p>
-      <p class="lang-ko" style="display: none;">기쁨이 어디 있나, 어디에, 그것들이 거기에 있지 않다면? 천사들이 새로운 노래를 부르고 있도다; 거기 종들이 울리고 있도다, 왕의 궁정에서. — 오 우리가 거기 있었더라면! — 오 우리가 거기 있었더라면!</p>
-    </section>
-
-    <section id="reading9" class="card">
-      <p class="lang-en"><em>The Word Became Flesh</em></p>
-      <p class="lang-ko" style="display: none;"><em>말씀이 육신이 되셨도다</em></p>
-      <p class="lang-en">In the beginning was the Word, and the Word was with God, and the Word was God.</p>
-      <p class="lang-ko" style="display: none;">태초에 말씀이 계셨고, 말씀이 하느님과 함께 계셨으며, 말씀은 하느님이셨다.</p>
-      <p class="lang-en">He was in the beginning with God.</p>
-      <p class="lang-ko" style="display: none;">그는 태초에 하느님과 함께 계셨다.</p>
-      <p class="lang-en">All things came to be through him, and without him nothing came to be. What came to be through him was life, and this life was the light of the human race; the light shines in the darkness, and the darkness has not overcome it.</p>
-      <p class="lang-ko" style="display: none;">모든 것이 그를 통하여 생겨났고, 그 없이 생겨난 것은 하나도 없다. 그를 통하여 생겨난 것은 생명이었고, 이 생명은 인간의 빛이었다. 빛이 어둠 속에서 빛나고 있으나 어둠이 그것을 이기지 못하였다.</p>
-      <p class="lang-en">A man named John was sent from God. He came for testimony, to testify to the light, so that all might believe through him. He was not the light, but came to testify to the light.</p>
-      <p class="lang-ko" style="display: none;">요한이라는 사람이 하느님께로부터 보내심을 받았다. 그는 증언을 위하여 왔으니, 빛에 대하여 증언하려 함이었다. 그래서 모든 사람이 그를 통하여 믿게 하려 함이었다. 그는 그 빛이 아니었고, 그 빛에 대하여 증언하러 온 자였다.</p>
-      <p class="lang-en">The true light, which enlightens everyone, was coming into the world.</p>
-      <p class="lang-ko" style="display: none;">모든 사람을 비추는 참빛이 세상에 오고 있었다.</p>
-      <p class="lang-en">He was in the world, and the world came to be through him, but the world did not know him.</p>
-      <p class="lang-ko" style="display: none;">그는 세상에 계셨고, 세상은 그를 통하여 생겨났지만, 세상은 그를 알지 못하였다.</p>
-      <p class="lang-en">He came to what was his own, but his own people did not accept him.</p>
-      <p class="lang-ko" style="display: none;">그는 자기 것에게 오셨지만, 자기 백성은 그를 받아들이지 않았다.</p>
-      <p class="lang-en">But to those who did accept him he gave power to become children of God, to those who believe in his name, who were born not by natural generation nor by human choice nor by a man's decision but of God.</p>
-      <p class="lang-ko" style="display: none;">그러나 그를 받아들인 이들에게는, 그의 이름을 믿는 이들에게는, 하느님의 자녀가 되는 권한을 주셨다. 그들은 혈통으로나 육정으로나 사람의 뜻으로 나지 않고 하느님에게서 태어났다.</p>
-      <p class="lang-en">And the Word became flesh and made his dwelling among us, and we saw his glory, the glory as of the Father's only Son, full of grace and truth.</p>
-      <p class="lang-ko" style="display: none;">말씀이 육신이 되어 우리 가운데 거하셨다. 우리는 그의 영광을 보았는데, 아버지의 외아들의 영광이요, 은총과 진리가 충만하신 분의 영광이었다.</p>
-    </section>
-
-    <section id="carol9" class="card carol">
-      <p class="lang-en"><em>John Francis Wade, arr. David Willcocks</em></p>
-      <p class="lang-ko" style="display: none;"><em>존 프랜시스 웨이드, 편곡 데이비드 윌콕스</em></p>
-      <h3 class="lang-en">Verse 1</h3>
-      <h3 class="lang-ko" style="display: none;">1절</h3>
-      <p class="lang-en">O come, all ye faithful, joyful and triumphant, O come ye, O come ye to Bethlehem; come and behold him, born the King of Angels.</p>
-      <p class="lang-ko" style="display: none;">오라, 모든 신실한 자들아, 기쁘고 승리하도다, 오라, 오라 베들레헴으로; 와서 그를 보라, 천사들의 왕으로 태어나셨도다.</p>
-      <p class="lang-en"><strong>Refrain:</strong> O come, let us adore him, O come, let us adore him, O come, let us adore him, Christ the Lord.</p>
-      <p class="lang-ko" style="display: none;"><strong>후렴:</strong> 오라, 우리가 그를 경배하자, 오라, 우리가 그를 경배하자, 오라, 우리가 그를 경배하자, 그리스도 주님이여.</p>
-      <h3 class="lang-en">Verse 2</h3>
-      <h3 class="lang-ko" style="display: none;">2절</h3>
-      <p class="lang-en">God of God, Light of Light, lo! he abhors not the Virgin's womb; very God, begotten, not created.</p>
-      <p class="lang-ko" style="display: none;">하느님 중의 하느님, 빛 중의 빛, 보라! 그는 동정녀의 태를 싫어하지 않으셨도다; 참 하느님, 낳으신 분, 창조되지 않으셨도다.</p>
-      <h3 class="lang-en">Verse 6</h3>
-      <h3 class="lang-ko" style="display: none;">6절</h3>
-      <p class="lang-en">Sing, choirs of angels, sing in exultation, sing, all ye citizens of heaven above! Glory to God in the highest.</p>
-      <p class="lang-ko" style="display: none;">노래하라, 천사들의 합창단이여, 환호하며 노래하라, 노래하라, 위 하늘의 모든 시민들이여! 지극히 높은 곳에서 하느님께 영광이요.</p>
-      <h3 class="lang-en">Verse 7</h3>
-      <h3 class="lang-ko" style="display: none;">7절</h3>
-      <p class="lang-en">Yea, Lord, we greet thee, born this happy morning, Jesu, to thee be glory given; Word of the Father, now in flesh appearing!</p>
-      <p class="lang-ko" style="display: none;">그렇다, 주님, 우리가 당신을 인사하나이다, 이 기쁜 아침에 태어나셨도다, 예수여, 당신께 영광이 있기를; 아버지의 말씀이시여, 이제 육신으로 나타나셨도다!</p>
-    </section>
-
-    <section id="closing" class="card">
-      <section class="carol">
-        <h3 class="lang-en">Final Carol – The First Noel</h3>
-        <h3 class="lang-ko" style="display: none;">마지막 성가 – 첫 번째 노엘</h3>
-        <p class="lang-en"><em>Traditional English carol</em></p>
-        <p class="lang-ko" style="display: none;"><em>전통적인 영국 성가</em></p>
-        <h4 class="lang-en">Verse 1</h4>
-        <h4 class="lang-ko" style="display: none;">1절</h4>
-        <p class="lang-en">The first Noël the angel did say was to certain poor shepherds in fields as they lay; in fields where they lay keeping their sheep, on a cold winter's night that was so deep.</p>
-        <p class="lang-ko" style="display: none;">첫 번째 노엘 천사가 말했도다, 들에 누워 있던 가난한 목자들에게; 그들이 양을 지키며 누워 있던 들에서, 매우 추운 겨울 밤에.</p>
-        <p class="lang-en"><strong>Refrain:</strong> Noël, Noël, Noël, Noël, born is the King of Israel.</p>
-        <p class="lang-ko" style="display: none;"><strong>후렴:</strong> 노엘, 노엘, 노엘, 노엘, 이스라엘의 왕이 태어나셨도다.</p>
-        <h4 class="lang-en">Verse 2</h4>
-        <h4 class="lang-ko" style="display: none;">2절</h4>
-        <p class="lang-en">They looked up and saw a star shining in the east, beyond them far; and to the earth it gave great light, and so it continued both day and night.</p>
-        <p class="lang-ko" style="display: none;">그들이 올려다보니 동쪽에 별이 빛나고 있었도다, 그들로부터 멀리; 그리고 땅에 큰 빛을 주었도다, 그래서 그것이 낮과 밤 계속되었도다.</p>
-        <h4 class="lang-en">Verse 3</h4>
-        <h4 class="lang-ko" style="display: none;">3절</h4>
-        <p class="lang-en">And by the light of that same star, three wise men came from country far; to seek for a King was their intent, and to follow the star wherever it went.</p>
-        <p class="lang-ko" style="display: none;">그리고 그 같은 별의 빛으로, 세 명의 현자가 먼 나라에서 왔도다; 왕을 찾는 것이 그들의 의도였고, 별이 어디로 가든 그것을 따랐도다.</p>
-        <h4 class="lang-en">Verse 4</h4>
-        <h4 class="lang-ko" style="display: none;">4절</h4>
-        <p class="lang-en">This star drew nigh to the northwest, o'er Bethlehem it took its rest; and there it did both stop and stay, right over the place where Jesus lay.</p>
-        <p class="lang-ko" style="display: none;">이 별이 서북쪽으로 가까이 와서, 베들레헴 위에서 쉬었도다; 그리고 거기서 멈추고 머물렀도다, 바로 예수께서 누워 계신 곳 위에.</p>
-        <h4 class="lang-en">Verse 5</h4>
-        <h4 class="lang-ko" style="display: none;">5절</h4>
-        <p class="lang-en">Then entered in those wise men three, full reverently upon their knee, and offered there in his presence their gold and myrrh and frankincense.</p>
-        <p class="lang-ko" style="display: none;">그때 그 세 명의 현자가 들어왔도다, 매우 경건하게 무릎을 꿇고, 그리고 거기서 그의 앞에 그들의 금과 몰약과 유향을 드렸도다.</p>
-      </section>
-    </section>
-
-    <section id="feedback" class="card">
-      <iframe class="lang-en" src="https://forms.gle/7aQXFFQujMHBk6U2A?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" loading="lazy">Loading…</iframe>
-      <iframe class="lang-ko" style="display: none;" src="https://forms.gle/VoiqR5hhWGPdjgmJ7?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" loading="lazy">Loading…</iframe>
-    </section>
-
-  </main>
-
-  <div class="bottom-nav-hint" x-show="showCoverOverlay && currentSectionIndex === 0" x-transition>
-    <div class="hint-arrow-left" :style="`left: ${rightArrowLeft}px; transform: translateX(-50%);`">
-      <div class="hint-content">
-        <p class="lang-en">Scroll forward</p>
-        <p class="lang-ko" style="display: none;">앞으로 스크롤</p>
-      </div>
-      <div class="arrow-pointer"></div>
-    </div>
-    <div class="hint-arrow-center" :style="`left: ${menuButtonLeft}px; transform: translateX(-50%);`">
-      <div class="hint-content">
-        <p class="lang-en">Font size</p>
-        <p class="lang-ko" style="display: none;">글꼴 크기</p>
-      </div>
-      <div class="arrow-pointer"></div>
-    </div>
-    <button class="hint-close" @click="showCoverOverlay = false" aria-label="Close">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-
-  <nav class="bottom-nav">
-    <div class="bottom-nav-inner">
-      <button class="nav-arrow nav-arrow-left" @click="scrollToSection(currentSectionIndex - 1)" :disabled="currentSectionIndex === 0" aria-label="Previous section">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 18l-6-6 6-6"/>
-        </svg>
-      </button>
-      <div class="menu-container">
-        <button class="menu-toggle" x-ref="menuButton" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-        <div class="menu-content" x-show="menuOpen" x-transition>
-          <div class="zoom-controls">
-            <button class="zoom-btn" @click="zoomOut()" :disabled="textZoom <= 0.8" aria-label="Decrease text size">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
+<body>
+    <!-- Top Bar with Table of Contents -->
+    <header class="top-bar">
+        <div class="top-bar-content">
+            <button class="toc-toggle" id="tocToggle" aria-label="Table of Contents">
+                <span class="toc-icon">☰</span>
+                <span class="toc-label" data-translate="toc-label">Table of Contents</span>
             </button>
-            <span class="zoom-percentage" x-text="Math.round(textZoom * 100) + '%'">100%</span>
-            <button class="zoom-btn" @click="zoomIn()" :disabled="textZoom >= 1.5" aria-label="Increase text size">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
-          </div>
-          <div class="language-toggle">
-            <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLanguage('en')">English</button>
-            <button class="lang-btn" :class="{ active: currentLang === 'ko' }" @click="switchLanguage('ko')">한국어</button>
-          </div>
+            <nav class="toc-dropdown" id="tocDropdown">
+                <ul class="toc-list">
+                    <li><a href="#cover" class="toc-link active" data-section="cover" data-translate="toc-cover">Cover</a></li>
+                    <li><a href="#prayer-intro" class="toc-link" data-section="prayer-intro" data-translate="toc-prayer-intro">Opening Prayer: Introduction</a></li>
+                    <li><a href="#prayer-our-father" class="toc-link" data-section="prayer-our-father" data-translate="toc-prayer-our-father">Opening Prayer: Our Father</a></li>
+                    <li><a href="#prayer-hail-mary" class="toc-link" data-section="prayer-hail-mary" data-translate="toc-prayer-hail-mary">Opening Prayer: Hail Mary</a></li>
+                    <li><a href="#prayer-closing" class="toc-link" data-section="prayer-closing" data-translate="toc-prayer-closing">Opening Prayer: Closing</a></li>
+                    <li><a href="#reading1" class="toc-link" data-section="reading1" data-translate="toc-reading1">Reading I</a></li>
+                    <li><a href="#carol1" class="toc-link" data-section="carol1" data-translate="toc-carol1">O Come, O Come, Emmanuel</a></li>
+                    <li><a href="#reading2" class="toc-link" data-section="reading2" data-translate="toc-reading2">Reading II</a></li>
+                    <li><a href="#carol2" class="toc-link" data-section="carol2" data-translate="toc-carol2">Creator of the Stars of Night</a></li>
+                    <li><a href="#reading3" class="toc-link" data-section="reading3" data-translate="toc-reading3">Reading III</a></li>
+                    <li><a href="#carol3" class="toc-link" data-section="carol3" data-translate="toc-carol3">Lo, How a Rose E'er Blooming</a></li>
+                    <li><a href="#reading4" class="toc-link" data-section="reading4" data-translate="toc-reading4">Reading IV</a></li>
+                    <li><a href="#carol4" class="toc-link" data-section="carol4" data-translate="toc-carol4">Once in Royal David's City</a></li>
+                    <li><a href="#reading5" class="toc-link" data-section="reading5" data-translate="toc-reading5">Reading V</a></li>
+                    <li><a href="#carol5" class="toc-link" data-section="carol5" data-translate="toc-carol5">Ave Maria</a></li>
+                    <li><a href="#reading6" class="toc-link" data-section="reading6" data-translate="toc-reading6">Reading VI</a></li>
+                    <li><a href="#carol6" class="toc-link" data-section="carol6" data-translate="toc-carol6">Silent Night</a></li>
+                    <li><a href="#reading7" class="toc-link" data-section="reading7" data-translate="toc-reading7">Reading VII</a></li>
+                    <li><a href="#carol7" class="toc-link" data-section="carol7" data-translate="toc-carol7">Hark! The Herald Angels Sing</a></li>
+                    <li><a href="#reading8" class="toc-link" data-section="reading8" data-translate="toc-reading8">Reading VIII</a></li>
+                    <li><a href="#carol8" class="toc-link" data-section="carol8" data-translate="toc-carol8">In Dulci Jubilo</a></li>
+                    <li><a href="#reading9" class="toc-link" data-section="reading9" data-translate="toc-reading9">Reading IX</a></li>
+                    <li><a href="#carol9" class="toc-link" data-section="carol9" data-translate="toc-carol9">O Come, All Ye Faithful</a></li>
+                    <li><a href="#closing" class="toc-link" data-section="closing" data-translate="toc-closing">Closing Prayer & Final Carol</a></li>
+                    <li><a href="#feedback" class="toc-link" data-section="feedback" data-translate="toc-feedback">Feedback</a></li>
+                </ul>
+            </nav>
         </div>
-      </div>
-      <button class="nav-arrow nav-arrow-right" x-ref="rightArrowButton" @click="scrollToSection(currentSectionIndex + 1)" :disabled="currentSectionIndex === sections.length - 1" aria-label="Next section">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 18l6-6-6-6"/>
-        </svg>
-      </button>
-    </div>
-  </nav>
-  <script>
-    function app() {
-      return {
-        currentLang: 'en',
-        tocOpen: false,
-        menuOpen: false,
-        currentSectionIndex: 0,
-        sections: [],
-        textZoom: 1.0,
-        showCoverOverlay: true,
-        showLanguageModal: true,
-        rightArrowLeft: 0,
-        menuButtonLeft: 0,
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="mainContent">
+        <!-- Cover Page Section -->
+        <section id="cover" class="section active" data-section="cover">
+            <div class="section-content">
+                <img src="img/cover-photo.jpg" alt="Lessons & Carols" class="cover-image">
+                <p class="cover-version">v2.3.7</p>
+            </div>
+        </section>
+
+        <!-- Opening Prayer: Introduction -->
+        <section id="prayer-intro" class="section" data-section="prayer-intro">
+            <div class="section-content">
+                <img src="img/prayer-1-introduction.png" alt="Opening Prayer: Introduction" class="prayer-image">
+            </div>
+        </section>
+
+        <!-- Opening Prayer: Our Father -->
+        <section id="prayer-our-father" class="section" data-section="prayer-our-father">
+            <div class="section-content">
+                <img src="img/prayer-2-pater-noster.png" alt="Opening Prayer: Our Father" class="prayer-image">
+            </div>
+        </section>
+
+        <!-- Opening Prayer: Hail Mary -->
+        <section id="prayer-hail-mary" class="section" data-section="prayer-hail-mary">
+            <div class="section-content">
+                <img src="img/prayer-3-ave-maria.png" alt="Opening Prayer: Hail Mary" class="prayer-image">
+            </div>
+        </section>
+
+        <!-- Opening Prayer: Closing -->
+        <section id="prayer-closing" class="section" data-section="prayer-closing">
+            <div class="section-content">
+                <img src="img/prayer-4-closing.png" alt="Opening Prayer: Closing" class="prayer-image">
+            </div>
+        </section>
+
+        <!-- Reading I -->
+        <section id="reading1" class="section" data-section="reading1">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading1-title">Reading I – Genesis 3:8–15</p>
+                <p class="reading-subtitle" data-translate="reading1-subtitle">The Fall and the First Promise of Redemption</p>
+                <div class="reading-text" data-translate="reading1-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 1 -->
+        <section id="carol1" class="section" data-section="carol1">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol1-subtitle">15th Century French melody, arr. David Willcocks</p>
+                <div class="carol-text" data-translate="carol1-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading II -->
+        <section id="reading2" class="section" data-section="reading2">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading2-title">Reading II – Genesis 22:15–18</p>
+                <p class="reading-subtitle" data-translate="reading2-subtitle">God's Promise to Abraham</p>
+                <div class="reading-text" data-translate="reading2-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 2 -->
+        <section id="carol2" class="section" data-section="carol2">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol2-subtitle">Latin hymn (9th Century)</p>
+                <div class="carol-text" data-translate="carol2-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading III -->
+        <section id="reading3" class="section" data-section="reading3">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading3-title">Reading III – Isaiah 9:1–6</p>
+                <p class="reading-subtitle" data-translate="reading3-subtitle">The People Who Walked in Darkness Have Seen a Great Light</p>
+                <div class="reading-text" data-translate="reading3-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 3 -->
+        <section id="carol3" class="section" data-section="carol3">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol3-subtitle">14th Century German melody</p>
+                <div class="carol-text" data-translate="carol3-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading IV -->
+        <section id="reading4" class="section" data-section="reading4">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading4-title">Reading IV – Isaiah 11:1–9</p>
+                <p class="reading-subtitle" data-translate="reading4-subtitle">The Peaceable Kingdom</p>
+                <div class="reading-text" data-translate="reading4-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 4 -->
+        <section id="carol4" class="section" data-section="carol4">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol4-subtitle">H.J. Gauntlett, arr. David Willcocks</p>
+                <div class="carol-text" data-translate="carol4-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading V -->
+        <section id="reading5" class="section" data-section="reading5">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading5-title">Reading V – Luke 1:26–38</p>
+                <p class="reading-subtitle" data-translate="reading5-subtitle">The Annunciation</p>
+                <div class="reading-text" data-translate="reading5-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 5 -->
+        <section id="carol5" class="section" data-section="carol5">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol5-subtitle">Jacques Arcadelt, 16th Century</p>
+                <div class="carol-text" data-translate="carol5-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading VI -->
+        <section id="reading6" class="section" data-section="reading6">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading6-title">Reading VI – Matthew 1:18–25</p>
+                <p class="reading-subtitle" data-translate="reading6-subtitle">The Birth of Jesus Christ</p>
+                <div class="reading-text" data-translate="reading6-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 6 -->
+        <section id="carol6" class="section" data-section="carol6">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol6-subtitle">Franz Gruber, arr. John Rutter</p>
+                <div class="carol-text" data-translate="carol6-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading VII -->
+        <section id="reading7" class="section" data-section="reading7">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading7-title">Reading VII – Luke 2:8–20</p>
+                <p class="reading-subtitle" data-translate="reading7-subtitle">The Birth of Jesus Announced to Shepherds</p>
+                <div class="reading-text" data-translate="reading7-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 7 -->
+        <section id="carol7" class="section" data-section="carol7">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol7-subtitle">Felix Mendelssohn, arr. David Willcocks</p>
+                <div class="carol-text" data-translate="carol7-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading VIII -->
+        <section id="reading8" class="section" data-section="reading8">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading8-title">Reading VIII – Matthew 2:1–12</p>
+                <p class="reading-subtitle" data-translate="reading8-subtitle">The Visit of the Magi</p>
+                <div class="reading-text" data-translate="reading8-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 8 -->
+        <section id="carol8" class="section" data-section="carol8">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol8-subtitle">Old German carol, arr. R. L. Pearsall</p>
+                <div class="carol-text" data-translate="carol8-text"></div>
+            </div>
+        </section>
+
+        <!-- Reading IX -->
+        <section id="reading9" class="section" data-section="reading9">
+            <div class="section-content">
+                <p class="reading-reference" data-translate="reading9-title">Reading IX – John 1:1–14</p>
+                <p class="reading-subtitle" data-translate="reading9-subtitle">The Word Became Flesh</p>
+                <div class="reading-text" data-translate="reading9-text"></div>
+            </div>
+        </section>
+
+        <!-- Carol 9 -->
+        <section id="carol9" class="section" data-section="carol9">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="carol9-subtitle">John Francis Wade, arr. David Willcocks</p>
+                <div class="carol-text" data-translate="carol9-text"></div>
+            </div>
+        </section>
+
+        <!-- Closing Prayer & Final Carol -->
+        <section id="closing" class="section" data-section="closing">
+            <div class="section-content">
+                <p class="carol-subtitle" data-translate="closing-subtitle">Traditional English carol</p>
+                <div class="carol-text" data-translate="closing-text"></div>
+            </div>
+        </section>
+
+        <!-- Feedback -->
+        <section id="feedback" class="section" data-section="feedback">
+            <div class="section-content">
+                <iframe src="https://forms.gle/yuifWLWvyMNX1uk97?embedded=true" class="feedback-iframe" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Bar with Controls -->
+    <footer class="bottom-bar">
+        <button class="nav-button nav-prev" id="prevButton" aria-label="Previous Section">
+            <span>‹</span>
+        </button>
         
-        init() {
-          // Initialize sections
-          this.sections = Array.from(this.$refs.mainContent.querySelectorAll('section.card'));
-          
-          // Don't set language automatically - wait for user selection from modal
-          // Set English as default for modal display only
-    const langEnElements = document.querySelectorAll('.lang-en');
-    const langKoElements = document.querySelectorAll('.lang-ko');
-          langEnElements.forEach(el => el.style.display = '');
-          langKoElements.forEach(el => el.style.display = 'none');
-          
-          // Start at the first section (Lessons & Carols) after language is selected
-          // This will be handled after modal closes
-          
-          // Update nav buttons
-          this.updateNavButtons();
-          
-          // Handle hash navigation (for TOC links)
-          window.addEventListener('hashchange', () => {
-            const hash = window.location.hash.slice(1);
-            const targetSection = this.sections.find(s => s.id === hash);
-            if (targetSection) {
-              const index = this.sections.indexOf(targetSection);
-              this.scrollToSection(index);
-            }
-          });
-          
-          // Handle initial hash if present
-          if (window.location.hash) {
-            setTimeout(() => {
-              const hash = window.location.hash.slice(1);
-              const targetSection = this.sections.find(s => s.id === hash);
-              if (targetSection) {
-                const index = this.sections.indexOf(targetSection);
-                this.scrollToSection(index);
-              }
-            }, 100);
-          }
-          
-          // Handle keyboard navigation
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-              e.preventDefault();
-              this.scrollToSection(this.currentSectionIndex - 1);
-            } else if (e.key === 'ArrowRight') {
-              e.preventDefault();
-              this.scrollToSection(this.currentSectionIndex + 1);
-            }
-          });
-          
-          // Update nav buttons on resize
-          window.addEventListener('resize', () => {
-            this.updateNavButtons();
-            this.updateHintPositions();
-          });
-          
-          // Update hint positions
-          setTimeout(() => {
-            this.updateHintPositions();
-          }, 200);
-        },
+        <div class="text-control-container">
+            <button class="text-control-toggle" id="textControlToggle" aria-label="Text Controls">
+                <span class="translate-icon">🌐</span>
+            </button>
+            <div class="text-control-menu" id="textControlMenu">
+                <div class="control-group">
+                    <label for="fontSize" data-translate="font-size-label">Font Size</label>
+                    <div class="font-size-controls">
+                        <button class="font-size-btn" data-size="small">A</button>
+                        <button class="font-size-btn active" data-size="medium">A</button>
+                        <button class="font-size-btn" data-size="large">A</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="language" data-translate="language-label">Language</label>
+                    <div class="language-controls">
+                        <button class="language-btn active" data-lang="en">English</button>
+                        <button class="language-btn" data-lang="ko">한국어</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        updateHintPositions() {
-          if (this.$refs.rightArrowButton && this.$refs.menuButton) {
-            const rightArrowRect = this.$refs.rightArrowButton.getBoundingClientRect();
-            const menuButtonRect = this.$refs.menuButton.getBoundingClientRect();
-            const hintContainer = document.querySelector('.bottom-nav-hint');
-            
-            if (hintContainer) {
-              const hintRect = hintContainer.getBoundingClientRect();
-              const hintStyles = getComputedStyle(hintContainer);
-              // Calculate position relative to the hint container's content area (padding box)
-              // getBoundingClientRect() returns border box, but absolute positioning uses padding box
-              const hintPaddingLeft = parseFloat(hintStyles.paddingLeft) || 0;
-              // Button center X position relative to viewport
-              const rightArrowCenterX = rightArrowRect.left + (rightArrowRect.width / 2);
-              const menuButtonCenterX = menuButtonRect.left + (menuButtonRect.width / 2);
-              // Position relative to padding box: viewport position - border box left - padding
-              this.rightArrowLeft = rightArrowCenterX - hintRect.left - hintPaddingLeft;
-              this.menuButtonLeft = menuButtonCenterX - hintRect.left - hintPaddingLeft;
-            }
-          }
-        },
-        
-        selectLanguage(lang) {
-          this.switchLanguage(lang);
-          this.showLanguageModal = false;
-          // Start at the first section after language selection
-          setTimeout(() => {
-            this.scrollToSection(0);
-            // Resize initial section after language is set
-            setTimeout(() => {
-              this.resizeSectionToContent(0);
-            }, 200);
-          }, 100);
-        },
-        
-        switchLanguage(lang) {
-          this.currentLang = lang;
-          const langEnElements = document.querySelectorAll('.lang-en');
-          const langKoElements = document.querySelectorAll('.lang-ko');
-      
-      // Show/hide language-specific elements
-      if (lang === 'en') {
-        langEnElements.forEach(el => el.style.display = '');
-        langKoElements.forEach(el => el.style.display = 'none');
-      } else {
-        langEnElements.forEach(el => el.style.display = 'none');
-        langKoElements.forEach(el => el.style.display = '');
-      }
-        },
-        
-        getCurrentSectionIndex() {
-          const scrollLeft = this.$refs.mainContent.scrollLeft;
-          const viewportWidth = window.innerWidth;
-          const currentIndex = Math.round(scrollLeft / viewportWidth);
-          return Math.min(currentIndex, this.sections.length - 1);
-        },
-        
-        scrollToSection(index) {
-          if (index < 0 || index >= this.sections.length) return;
-          const viewportWidth = window.innerWidth;
-          const targetScroll = index * viewportWidth;
-          
-          // Reset window vertical scroll first
-          window.scrollTo({ top: 0, behavior: 'instant' });
-          
-          // Resize section to fit content before scrolling
-          this.resizeSectionToContent(index);
-          
-          // Then scroll horizontally to the section
-          this.$refs.mainContent.scrollTo({
-            left: targetScroll,
-            behavior: 'smooth'
-          });
-        },
-        
-        resizeSectionToContent(index) {
-          if (index < 0 || index >= this.sections.length) return;
-          const section = this.sections[index];
-          if (!section) return;
-          
-          // Temporarily remove height constraints to measure content
-          const originalHeight = section.style.height;
-          section.style.height = 'auto';
-          
-          // Measure the actual content height
-          const contentHeight = section.scrollHeight;
-          const viewportHeight = window.innerHeight;
-          const topBarHeight = 60; // TOC height
-          const bottomBarHeight = window.innerWidth <= 600 ? 70 : 80; // Bottom nav height (smaller on mobile)
-          const availableHeight = viewportHeight - topBarHeight - bottomBarHeight;
-          
-          // Set height to content size, but cap at viewport height
-          // If content is smaller, use content height; if larger, allow scrolling
-          const finalHeight = Math.min(contentHeight, availableHeight);
-          section.style.height = finalHeight + 'px';
-          
-          // Reset scroll position to top when resizing
-          section.scrollTop = 0;
-        },
-        
-        updateNavButtons() {
-          const newIndex = this.getCurrentSectionIndex();
-          if (newIndex !== this.currentSectionIndex) {
-            this.currentSectionIndex = newIndex;
-            // Resize the current section to fit its content
-            this.resizeSectionToContent(newIndex);
-          }
-        },
-        
-        getCurrentSectionName(lang) {
-          if (this.sections.length === 0 || this.currentSectionIndex < 0 || this.currentSectionIndex >= this.sections.length) {
-            return lang === 'en' ? 'Program Overview' : '프로그램 개요';
-          }
-          
-          const currentSection = this.sections[this.currentSectionIndex];
-          const sectionId = currentSection.id;
-          
-          // Get the section name from the TOC link
-          const tocList = document.querySelector(`ol.lang-${lang}`);
-          if (tocList) {
-            const tocLink = tocList.querySelector(`a[href="#${sectionId}"]`);
-            if (tocLink) {
-              return tocLink.textContent.trim();
-            }
-          }
-          
-          return lang === 'en' ? 'Program Overview' : '프로그램 개요';
-        },
-        
-        zoomIn() {
-          if (this.textZoom < 1.5) {
-            this.textZoom = Math.min(this.textZoom + 0.1, 1.5);
-          }
-        },
-        
-        zoomOut() {
-          if (this.textZoom > 0.8) {
-            this.textZoom = Math.max(this.textZoom - 0.1, 0.8);
-          }
-        }
-      }
-    }
-  </script>
+        <button class="nav-button nav-next" id="nextButton" aria-label="Next Section">
+            <span>›</span>
+        </button>
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
