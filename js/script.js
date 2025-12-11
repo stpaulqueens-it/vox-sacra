@@ -340,6 +340,8 @@ const translations = {
         'closing-text': '<p class="verse"><strong>Verse 1</strong><br>The first Noël the angel did say was to certain poor shepherds in fields as they lay; in fields where they lay keeping their sheep, on a cold winter\'s night that was so deep.</p><p class="refrain"><strong>Refrain:</strong> Noël, Noël, Noël, Noël, born is the King of Israel.</p><p class="verse"><strong>Verse 2</strong><br>They looked up and saw a star shining in the east, beyond them far; and to the earth it gave great light, and so it continued both day and night.</p><p class="verse"><strong>Verse 3</strong><br>And by the light of that same star, three wise men came from country far; to seek for a King was their intent, and to follow the star wherever it went.</p><p class="verse"><strong>Verse 4</strong><br>This star drew nigh to the northwest, o\'er Bethlehem it took its rest; and there it did both stop and stay, right over the place where Jesus lay.</p><p class="verse"><strong>Verse 5</strong><br>Then entered in those wise men three, full reverently upon their knee, and offered there in his presence their gold and myrrh and frankincense.</p>',
         'feedback-title': 'Feedback',
         'feedback-content': '<p>We welcome your feedback on this service.</p><p><a href="https://forms.gle/VoiqR5hhWGPdjgmJ7?embedded=true" target="_blank">Click here to provide feedback</a></p>',
+        'feedback-text': 'We\'d love to hear your thoughts about this service.',
+        'feedback-link': 'Provide Feedback',
         'font-size-label': 'Font Size',
         'language-label': 'Language'
     },
@@ -435,6 +437,8 @@ const translations = {
         'closing-text': '<p class="verse"><strong>1절</strong><br>첫 번째 노엘 천사가 말했도다, 들에 누워 있던 가난한 목자들에게; 그들이 양을 지키며 누워 있던 들에서, 매우 추운 겨울 밤에.</p><p class="refrain"><strong>후렴:</strong> 노엘, 노엘, 노엘, 노엘, 이스라엘의 왕이 태어나셨도다.</p><p class="verse"><strong>2절</strong><br>그들이 올려다보니 동쪽에 별이 빛나고 있었도다, 그들로부터 멀리; 그리고 땅에 큰 빛을 주었도다, 그래서 그것이 낮과 밤 계속되었도다.</p><p class="verse"><strong>3절</strong><br>그리고 그 같은 별의 빛으로, 세 명의 현자가 먼 나라에서 왔도다; 왕을 찾는 것이 그들의 의도였고, 별이 어디로 가든 그것을 따랐도다.</p><p class="verse"><strong>4절</strong><br>이 별이 서북쪽으로 가까이 와서, 베들레헴 위에서 쉬었도다; 그리고 거기서 멈추고 머물렀도다, 바로 예수께서 누워 계신 곳 위에.</p><p class="verse"><strong>5절</strong><br>그때 그 세 명의 현자가 들어왔도다, 매우 경건하게 무릎을 꿇고, 그리고 거기서 그의 앞에 그들의 금과 몰약과 유향을 드렸도다.</p>',
         'feedback-title': '피드백',
         'feedback-content': '<p>이 예배에 대한 피드백을 환영합니다.</p><p><a href="https://forms.gle/PQ7d4zRT9yns6YaK7?embedded=true" target="_blank">피드백을 제공하려면 여기를 클릭하세요</a></p>',
+        'feedback-text': '이 예배에 대한 여러분의 생각을 듣고 싶습니다.',
+        'feedback-link': '피드백 제공',
         'font-size-label': '글자 크기',
         'language-label': '언어'
     }
