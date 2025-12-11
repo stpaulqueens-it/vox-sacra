@@ -196,11 +196,12 @@ html {
   scroll-snap-type: x mandatory;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
-  min-height: calc(100vh - 200px);
+  height: 100vh;
   margin-bottom: 80px;
   margin-top: 60px;
   padding-top: 0;
   position: relative;
+  align-items: flex-start;
 }
 
 .content::-webkit-scrollbar {
@@ -214,16 +215,20 @@ html {
   scroll-snap-stop: always;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  padding-top: 1rem;
+  padding-top: calc(2rem + 60px);
   padding-bottom: calc(1rem + 80px);
   box-sizing: border-box;
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  height: auto;
+  align-self: flex-start;
+  overflow-y: auto;
 }
 
 .content > section#feedback {
   padding: 0;
+  padding-top: calc(2rem + 60px);
   padding-bottom: 80px;
   display: block;
   overflow: hidden;
@@ -612,10 +617,12 @@ html {
   }
   
   .content > section {
+    padding-top: calc(2rem + 60px);
     padding-bottom: calc(1rem + 70px);
   }
   
   .content > section#feedback {
+    padding-top: calc(2rem + 60px);
     padding-bottom: 70px;
   }
   

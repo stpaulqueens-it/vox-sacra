@@ -733,6 +733,10 @@
           // Start at the first section after language selection
           setTimeout(() => {
             this.scrollToSection(0);
+            // Resize initial section after language is set
+            setTimeout(() => {
+              this.resizeSectionToContent(0);
+            }, 200);
           }, 100);
         },
         
@@ -766,6 +770,9 @@
           // Reset window vertical scroll first
           window.scrollTo({ top: 0, behavior: 'instant' });
           
+          // Resize section to fit content before scrolling
+          this.resizeSectionToContent(index);
+          
           // Then scroll horizontally to the section
           this.$refs.mainContent.scrollTo({
             left: targetScroll,
@@ -773,8 +780,38 @@
           });
         },
         
+        resizeSectionToContent(index) {
+          if (index < 0 || index >= this.sections.length) return;
+          const section = this.sections[index];
+          if (!section) return;
+          
+          // Temporarily remove height constraints to measure content
+          const originalHeight = section.style.height;
+          section.style.height = 'auto';
+          
+          // Measure the actual content height
+          const contentHeight = section.scrollHeight;
+          const viewportHeight = window.innerHeight;
+          const topBarHeight = 60; // TOC height
+          const bottomBarHeight = window.innerWidth <= 600 ? 70 : 80; // Bottom nav height (smaller on mobile)
+          const availableHeight = viewportHeight - topBarHeight - bottomBarHeight;
+          
+          // Set height to content size, but cap at viewport height
+          // If content is smaller, use content height; if larger, allow scrolling
+          const finalHeight = Math.min(contentHeight, availableHeight);
+          section.style.height = finalHeight + 'px';
+          
+          // Reset scroll position to top when resizing
+          section.scrollTop = 0;
+        },
+        
         updateNavButtons() {
-          this.currentSectionIndex = this.getCurrentSectionIndex();
+          const newIndex = this.getCurrentSectionIndex();
+          if (newIndex !== this.currentSectionIndex) {
+            this.currentSectionIndex = newIndex;
+            // Resize the current section to fit its content
+            this.resizeSectionToContent(newIndex);
+          }
         },
         
         getCurrentSectionName(lang) {
