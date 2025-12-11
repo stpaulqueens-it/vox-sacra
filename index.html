@@ -3,12 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>Lessons &amp; Carols – Program</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="description" content="Program for Lessons &amp; Carols: readings and carols in English and Korean.">
   <link rel="stylesheet" href="styles.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  </script>
 </head>
-<body x-data="app()" x-init="init()">
+<body x-data="app()" x-init="init()" :style="`--text-zoom: ${textZoom}`">
   <header class="site-header">
     <div class="header-inner">
       <h1 class="lang-ko">말씀과 성가</h1>
@@ -548,9 +559,33 @@
           <path d="M15 18l-6-6 6-6"/>
         </svg>
       </button>
-      <div class="language-toggle">
-        <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLanguage('en')">English</button>
-        <button class="lang-btn" :class="{ active: currentLang === 'ko' }" @click="switchLanguage('ko')">한국어</button>
+      <div class="menu-container">
+        <button class="menu-toggle" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-label="Toggle menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="menu-content" x-show="menuOpen" x-transition>
+          <div class="zoom-controls">
+            <button class="zoom-btn" @click="zoomOut()" :disabled="textZoom <= 0.8" aria-label="Decrease text size">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+            <button class="zoom-btn" @click="zoomIn()" :disabled="textZoom >= 1.5" aria-label="Increase text size">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="language-toggle">
+            <button class="lang-btn" :class="{ active: currentLang === 'en' }" @click="switchLanguage('en')">English</button>
+            <button class="lang-btn" :class="{ active: currentLang === 'ko' }" @click="switchLanguage('ko')">한국어</button>
+          </div>
+        </div>
       </div>
       <button class="nav-arrow nav-arrow-right" @click="scrollToSection(currentSectionIndex + 1)" :disabled="currentSectionIndex === sections.length - 1" aria-label="Next section">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -564,8 +599,10 @@
       return {
         currentLang: 'en',
         tocOpen: false,
+        menuOpen: false,
         currentSectionIndex: 0,
         sections: [],
+        textZoom: 1.0,
         
         init() {
           // Initialize sections
@@ -655,6 +692,18 @@
         
         updateNavButtons() {
           this.currentSectionIndex = this.getCurrentSectionIndex();
+        },
+        
+        zoomIn() {
+          if (this.textZoom < 1.5) {
+            this.textZoom = Math.min(this.textZoom + 0.1, 1.5);
+          }
+        },
+        
+        zoomOut() {
+          if (this.textZoom > 0.8) {
+            this.textZoom = Math.max(this.textZoom - 0.1, 0.8);
+          }
         }
       }
     }
