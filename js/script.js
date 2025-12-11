@@ -342,6 +342,7 @@ const translations = {
         'feedback-content': '<p>We welcome your feedback on this service.</p><p><a href="https://forms.gle/VoiqR5hhWGPdjgmJ7?embedded=true" target="_blank">Click here to provide feedback</a></p>',
         'feedback-text': 'We\'d love to hear your thoughts about this service.',
         'feedback-link': 'Provide Feedback',
+        'feedback-url': 'https://forms.gle/VoiqR5hhWGPdjgmJ7',
         'font-size-label': 'Font Size',
         'language-label': 'Language'
     },
@@ -439,6 +440,7 @@ const translations = {
         'feedback-content': '<p>이 예배에 대한 피드백을 환영합니다.</p><p><a href="https://forms.gle/PQ7d4zRT9yns6YaK7?embedded=true" target="_blank">피드백을 제공하려면 여기를 클릭하세요</a></p>',
         'feedback-text': '이 예배에 대한 여러분의 생각을 듣고 싶습니다.',
         'feedback-link': '피드백 제공',
+        'feedback-url': 'https://forms.gle/PQ7d4zRT9yns6YaK7',
         'font-size-label': '글자 크기',
         'language-label': '언어'
     }
@@ -464,6 +466,12 @@ function updateLanguage() {
             } else {
                 element.textContent = translation[key];
             }
+        }
+        
+        // Update href for elements with data-translate-url attribute (e.g., feedback link)
+        const urlKey = element.getAttribute('data-translate-url');
+        if (urlKey && translation[urlKey]) {
+            element.href = translation[urlKey];
         }
     });
     
