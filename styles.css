@@ -284,6 +284,26 @@ html {
   margin: 0;
 }
 
+.google-form-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.google-form-container iframe {
+  width: 100%;
+  min-height: 800px;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .google-form-container iframe {
+    min-height: 600px;
+  }
+}
+
 .bottom-nav-hint {
   position: fixed;
   bottom: 80px;

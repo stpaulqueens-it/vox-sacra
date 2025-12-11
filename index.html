@@ -554,6 +554,17 @@
       </section>
     </section>
 
+    <section id="feedback" class="card">
+      <h2 class="lang-en">Feedback</h2>
+      <h2 class="lang-ko" style="display: none;">피드백</h2>
+      <div class="google-form-container lang-en">
+        <iframe src="https://forms.gle/7aQXFFQujMHBk6U2A?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" loading="lazy">Loading…</iframe>
+      </div>
+      <div class="google-form-container lang-ko" style="display: none;">
+        <iframe src="https://forms.gle/VoiqR5hhWGPdjgmJ7?embedded=true" width="100%" height="800" frameborder="0" marginheight="0" marginwidth="0" loading="lazy">Loading…</iframe>
+      </div>
+    </section>
+
   </main>
 
   <div class="bottom-nav-hint" x-show="showCoverOverlay && currentSectionIndex === 0" x-transition>
@@ -642,8 +653,8 @@
           
           // Don't set language automatically - wait for user selection from modal
           // Set English as default for modal display only
-          const langEnElements = document.querySelectorAll('.lang-en');
-          const langKoElements = document.querySelectorAll('.lang-ko');
+    const langEnElements = document.querySelectorAll('.lang-en');
+    const langKoElements = document.querySelectorAll('.lang-ko');
           langEnElements.forEach(el => el.style.display = '');
           langKoElements.forEach(el => el.style.display = 'none');
           
@@ -733,15 +744,15 @@
           this.currentLang = lang;
           const langEnElements = document.querySelectorAll('.lang-en');
           const langKoElements = document.querySelectorAll('.lang-ko');
-          
-          // Show/hide language-specific elements
-          if (lang === 'en') {
-            langEnElements.forEach(el => el.style.display = '');
-            langKoElements.forEach(el => el.style.display = 'none');
-          } else {
-            langEnElements.forEach(el => el.style.display = 'none');
-            langKoElements.forEach(el => el.style.display = '');
-          }
+      
+      // Show/hide language-specific elements
+      if (lang === 'en') {
+        langEnElements.forEach(el => el.style.display = '');
+        langKoElements.forEach(el => el.style.display = 'none');
+      } else {
+        langEnElements.forEach(el => el.style.display = 'none');
+        langKoElements.forEach(el => el.style.display = '');
+      }
         },
         
         getCurrentSectionIndex() {
